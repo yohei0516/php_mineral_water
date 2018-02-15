@@ -12,61 +12,61 @@
 // var_dump($_POST);
 
 //POST送信されていたら
- require('dbconnect.php');
- if (isset($_POST) && !empty($_POST)){
-  //認証処理
-  try{
-  //メンバーズテーブルでテーブルの中からメールアドレスとパスワードが入力されたものと合致する
-  //データを取得
-  //暗号化したパスワードを元に戻すのではなく、再度パスワードを暗号化する。
-  $sql = "SELECT * FROM `kotobato_members` WHERE `email`=? AND `password`=?";
+//  require('dbconnect.php');
+//  if (isset($_POST) && !empty($_POST)){
+//   //認証処理
+//   try{
+//   //メンバーズテーブルでテーブルの中からメールアドレスとパスワードが入力されたものと合致する
+//   //データを取得
+//   //暗号化したパスワードを元に戻すのではなく、再度パスワードを暗号化する。
+//   $sql = "SELECT * FROM `kotobato_members` WHERE `email`=? AND `password`=?";
 
 
-  //SQL文実行
-  //パスワードは、入力されたものを暗号化した上で使用する
-  $data = array($_POST["email"],sha1($_POST["password"]));
-  $stmt = $dbh->prepare($sql);
-  $stmt->execute($data);
+//   //SQL文実行
+//   //パスワードは、入力されたものを暗号化した上で使用する
+//   $data = array($_POST["email"],sha1($_POST["password"]));
+//   $stmt = $dbh->prepare($sql);
+//   $stmt->execute($data);
 
 
-  //1行取得
-  $members = $stmt->fetch(PDO::FETCH_ASSOC);
+//   //1行取得
+//   $members = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// var_dump($data);
-  // echo "</pre>";
-  // var_dump($members);
-  // echo "</pre>";
+// // var_dump($data);
+//   // echo "</pre>";
+//   // var_dump($members);
+//   // echo "</pre>";
 
 
-  if($members == false){
-    //認証失敗
-    $error["login"] = "failed";
-  }else{
-    //認証成功
-    //　１．セッション変数に会員idを保存
-    $_SESSION["id"] = $members["id"];
+//   if($members == false){
+//     //認証失敗
+//     $error["login"] = "failed";
+//   }else{
+//     //認証成功
+//     //　１．セッション変数に会員idを保存
+//     $_SESSION["id"] = $members["id"];
 
-    //２．ログインした時間をセッション変数の保存
-    $_SESSION["time"] = time();
+//     //２．ログインした時間をセッション変数の保存
+//     $_SESSION["time"] = time();
 
-    //３．自動ログインの処理
-    if($_POST["save"] == "on"){
-      //クッキーにログイン情報を記録（保存したい名前、保存したい値、保存したい期間：秒数）
-      setcookie('email',$_POST["email"],time()+60*60*24*14);
-      setcookie('password',$_POST["password"],time()+60*60*24*14);
+//     //３．自動ログインの処理
+//     if($_POST["save"] == "on"){
+//       //クッキーにログイン情報を記録（保存したい名前、保存したい値、保存したい期間：秒数）
+//       setcookie('email',$_POST["email"],time()+60*60*24*14);
+//       setcookie('password',$_POST["password"],time()+60*60*24*14);
 
-    }
+//     }
 
-    // ４．ログイン後の画面に移動
-    header("Location: main.php");
-    exit();
-  }
+//     // ４．ログイン後の画面に移動
+//     header("Location: main.php");
+//     exit();
+//   }
 
-  }catch(Exception $e){
-     echo 'SQL実行エラー:'.$e->getMessage();
-    exit();
-  }
-}
+//   }catch(Exception $e){
+//      echo 'SQL実行エラー:'.$e->getMessage();
+//     exit();
+//   }
+// }
 
 
  ?>
@@ -83,7 +83,7 @@
   <link rel="stylesheet" href="css/index/style.css">
   <link rel="stylesheet" href="css/index/bootstrap.css">
   <!-- モーダルウィンドウ -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
   <script src="js/login.js"></script>
 </head>
 <body>
@@ -121,25 +121,75 @@
           <link href="https://code.ionicframework.com/ionicons/1.4.1/css/ionicons.min.css" rel="stylesheet" type="text/css"/>
           <div class="signin cf">
             <div class="avatar"></div>
-            <form method="post" action="" class="form-horizontal" role="form">
+            <form method="post" action="" class="form-horizontal" role="form" id="form_modal" accept-charset="utf-8" return false>
+
               <div class="inputrow">
-                <input type="email" id="name" class="form-control" placeholder="メールアドレス" name="email"/>
+                <input type="text" id="email" class="form-control" placeholder="メールアドレス" name="email"/>
                 <label class="ion-person" for="name"></label>
               </div>
 
               <div class="inputrow">
-              <input type="password" id="pass" class="form-control" placeholder="パスワード" name="password"/>
-              <label class="ion-locked" for="pass"></label>
+              <input type="password" id="password" class="form-control" placeholder="パスワード" name="password"/>
+              <label class="ion-locked" for="password"></label>
               </div>
-              <div>
-              <?php if((isset($error["login"])) && ($error["login"]=='failed')){ ?>
-              <p class="error">※emailかパスワードが間違っています。</p>
-              <?php } ?>
-              </div>
+              
               <input type="checkbox" name="save" id="remember"/>
-              <label class="radio" for="remember">ログイン情報を記憶する</label>
-              <input type="submit" value="Login"/>
+              <label class="radio" for="remember" name="">ログイン情報を記憶する</label>
               </form>
+
+              <input type="submit" value="Login" id="ajax"/>
+               <div class="result"></div>
+                <script type="text/javascript">
+
+                    $(function(){
+                        //submitしたときの挙動
+                        $('#modal-content').on('submit',function(e){
+                            e.preventDefault();
+                            //Loginが押されたら
+                            $.ajax({
+                                url:'request.php',
+                                type:'POST',
+                                data:{
+                                    'email':$('#email').val(),
+                                    'password':$('#password').val(),
+                                    'save':$('#remember').val()
+                                }
+                            })
+                            .done(function(data){
+                                $('.result').html(data);
+                                console.log(data);
+                            })
+                            .fail(function(){
+                                $('.result').html(data);
+                                console.log(data);
+                            });
+                        });
+
+                        $('#ajax').on('click',function(){
+                            $.ajax({
+                                url:'request.php',
+                                type:'POST',
+                                data:{
+                                    'email':$('#email').val(),
+                                    'password':$('#password').val(),
+                                    'save':$('#remember').val()
+
+                                }
+                            })
+                            .done(function(data){
+                                $('.result').html(data);
+                                console.log(data);
+
+                            })
+                            .fail(function(data){
+                                $('.result').html(data);
+                                console.log(data);
+                            });
+
+                        });
+                    });
+                </script>
+
              </div>     
           </div>
         </p>
