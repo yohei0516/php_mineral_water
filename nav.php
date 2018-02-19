@@ -19,8 +19,13 @@
 						</li> -->
 						<li><a id="modal-open" class="buttons button button-link">投稿</a></li>
 						<li><a href="#">ジャンル</a></li>
-						<li><a href="#">検索</a></li>
+<!-- 						<li><a href="#">検索</a></li> -->
 						<li><a href="profile.html">プロフィール</a></li>
+						<form id="form02" action="#">
+					    <input id="input02" type="text" placeholder="検索"><!--
+					    /input間で改行したい場合はコメントアウト必須/
+					    --><input id="submit02" type="submit" value="">
+						</form>
 						<li><a href="index.html">ログアウト</a></li>
 					</ul>
 				</div>
