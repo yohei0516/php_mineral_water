@@ -1,3 +1,63 @@
+<?php 
+  session_start();
+  // DBの接続
+  require('dbconnect.php');
+
+  // ログインしている人のプロフィール情報をmembersテーブルから取得
+  $sql = "SELECT * FROM `kotobato_members` WHERE `id`=".$_SESSION["id"];
+  $stmt = $dbh->prepare($sql);
+  $stmt->execute();
+  $profile_member = $stmt->fetch(PDO::FETCH_ASSOC);
+  // var_dump($_SESSION);
+  // exit;
+  //一覧データを取得
+  $sql = "SELECT * FROM `kotobato_members` INNER JOIN `kotobato_follows` ON `kotobato_members`.`id` = `kotobato_follows`.`follower_id` WHERE `kotobato_follows`.`member_id` = ".$_SESSION["id"]." ORDER BY `kotobato_follows`.`created` DESC";
+
+  $stmt = $dbh->prepare($sql);
+  $stmt->execute();
+  // 一覧表示用の配列を用意
+  $post_list = array();
+  //　複数行のデータを取得するためループ
+  while (1) {
+    $one_post = $stmt->fetch(PDO::FETCH_ASSOC);
+    // var_dump($one_post);
+    // exit;
+    if ($one_post == false){
+      break;
+    }else{
+      //データが取得できている
+      $post_list[] = $one_post;
+
+    }
+  }
+
+//フォロー処理
+// profile.php?follow_id=7 というリンクが推された＝フォローボタンが押された
+  if (isset($_GET["follow_id"])){
+    //follow情報を記録するSQL文を作成
+    $sql = "INSERT INTO `kotobato_follows` (`member_id`,`follower_id`) VALUES (?, ?);";
+    $data = array($_SESSION["id"],$_GET["follow_id"]);
+    $fl_stmt = $dbh->prepare($sql);
+    $fl_stmt->execute($data);
+    //フォロー押す前の状態に戻す（再読込で、再度フォロー処理が動くのを防ぐ）
+    header("Location: follows.php");
+  }
+
+//フォロー解除処理
+  if(isset($_GET["unfollow_id"])){
+    // フォロー情報を削除するSQLを作成
+    $sql = "DELETE FROM `kotobato_follows` WHERE `member_id`=? AND `follower_id`=?";
+    $data = array($_SESSION["id"],$_GET["unfollow_id"]);
+    $unfl_stmt = $dbh->prepare($sql);
+    $unfl_stmt->execute($data);
+
+    //フォロー解除を押す前の状態に戻す
+    header("Location: following.php");
+
+  }
+  
+ ?>
+
 <!DOCTYPE HTML>
 <!--
 	Justice by gettemplates.co
@@ -108,9 +168,8 @@
                     <a class="follows"　href="#" value="フォロー" style="color:#7f7f7f;font-weight: bold;">フォロー</a>
                     <a class="following"　href="#" value="フォロワー" style="color:#7f7f7f;font-weight: bold;">フォロワー</a>
                 </div>
-                	<div class="desc" style="text-align:left;font-weight: bold;margin-left: 5px;">
-                		デジタルハリウッド大学中退<br>職業：校長先生が話す前に子供を静かにさせる<br>やる気、元気、殺意！<br><br>
-                 	</div>
+                	<div class="desc" style="text-align:left;font-weight: bold;margin-left: 5px;">デジタルハリウッド大学中退<br>職業：校長先生が話す前に子供を静かにさせる<br>やる気、元気、殺意！<br><br>
+                	</div>
                 </div>
             </div>
         </div>
@@ -118,36 +177,15 @@
 						<div class="col-xs-12 col-md-7 col-lg-offset-1 col-lg-7" style="margin-top:245px;">
 							<div class="mypage-inner">
 								
-									<div class="col-xs-4 desc col-md-6 col-lg-4" align="center" style="background-color: white;width:200px; height:180px;margin-right: 5px;margin-top: 5px;border-radius:10px;border: 2px solid #3B5998;">
+								<?php foreach ($post_list as $one_post) { ?> 
+									<div class="col-xs-4 desc col-md-6 col-lg-4" align="center" style="background-color: white;width:200px; height:240px;margin-right: 5px;margin-top: 5px;border-radius:10px;border: 2px solid #3B5998;">
 										<img class="img-responsive" src="images/image_1.jpg" alt="mypage" style="width:120px; height:120px;border-radius:50%;margin-top: 5px;">
-										<h5 style="font-weight: bold;margin-top: 25px;">投稿１投稿１投稿１投</h5>
+										<h5 style="font-weight: bold;margin-top: 25px;"><?php echo $one_post["nick_name"]; ?></h5>
+										<a href="following.php?unfollow_id=<?php echo $one_post["follower_id"]; ?>">
+					          <button class="btn btn-default">フォロー解除</button>
+					          </a>    
 									</div>
-
-									<div class="desc col-xs-4 desc col-md-6 col-lg-4" align="center" style="background-color: white;width:200px; height:180px;margin-right: 5px;margin-top: 5px;border-radius:10px;border: 2px solid #3B5998;">
-										<img class="img-responsive" src="images/image_2.jpg" alt="mypage" style="width:120px; height:120px;border-radius:50%;margin-top: 5px;">
-										<h5 style="font-weight: bold;margin-top: 15px;margin-top: 25px;">投稿2投稿2投稿2投</h5>
-									</div>
-
-									<div class="desc col-xs-4 desc col-md-6 col-lg-4" align="center" style="background-color: white;width:200px; height:180px;margin-right: 5px;margin-top: 5px;border-radius:10px;border: 2px solid #3B5998;">
-										<img class="img-responsive" src="images/image_3.jpg" alt="mypage" style="width:120px; height:120px;border-radius:50%;margin-top: 5px;">
-										<h5 style="font-weight: bold;margin-top: 25px;">投稿3投稿3投稿3投</h5>
-									</div>
-
-									<div class="desc col-xs-4 desc col-md-6 col-lg-4" align="center" style="background-color: white;width:200px; height:180px;margin-right: 5px;margin-top: 5px;border-radius:10px;border: 2px solid #3B5998;">
-										<img class="img-responsive" src="images/image_4.jpg" alt="mypage" style="width:120px; height:120px;border-radius:50%;margin-top: 5px;">
-										<h5 style="font-weight: bold;margin-top: 15px;margin-top: 25px;">投稿4投稿4投稿4投</h5>
-									</div>
-
-									<div class="desc col-xs-4 desc col-md-6 col-lg-4" align="center" style="background-color: white;width:200px; height:180px;margin-right: 5px;margin-top: 5px;border-radius:10px;border: 2px solid #3B5998;">
-										<img class="img-responsive" src="images/image_5.jpg" alt="mypage" style="width:120px; height:120px;border-radius:50%;margin-top: 5px;">
-										<h5 style="font-weight: bold;margin-top: 15px;margin-top: 25px;">投稿5投稿5投稿5投</h5>
-									</div>
-
-									<div class="desc col-xs-4 desc col-md-6 col-lg-4" align="center" style="background-color: white;width:200px; height:180px;margin-right: 5px;margin-top: 5px;border-radius:10px;border: 2px solid #3B5998;">
-										<img class="img-responsive" src="images/image_6.jpg" alt="mypage" style="width:120px; height:120px;border-radius:50%;margin-top: 5px;">
-										<h5 style="font-weight: bold;margin-top: 25px;">投稿6投稿6投稿6投</h5>
-									</div>
-
+									<?php } ?>
 
 									</div>
 							</div>

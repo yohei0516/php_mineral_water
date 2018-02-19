@@ -2,7 +2,6 @@
 session_start();
 header('Content-type: text/plain; charset= UTF-8');
 
-
  require('dbconnect.php');
  if (isset($_POST) && !empty($_POST)){
   //認証処理
@@ -48,17 +47,6 @@ $redirect_flag = 0;
 
     }
 
-     // ４．ログイン後の画面に移動
-    // header("Location: main.php");
-
-// <!-- <script type="text/javascript">
-//   $(function(){
-//     window.location.href= $(this).val;
-//     }
-// </script> -->
-
-
-    // exit();
   }
 
   }catch(Exception $e){
@@ -72,22 +60,16 @@ echo "※emailかパスワードが間違っています。";
 
 }else{
   //no error
-
   $redirect_flag = 1;
 }
 
-
-
-
  ?>
-
 
 <?php if ($redirect_flag == 1) { ?>
 
-<script type="text/javascript">
-console.log('redirect');
+  <script type="text/javascript">
+    // console.log('redirect');
     window.location.href= 'main.php';
-
- </script>
+  </script>
  
- <?php } ?>
+<?php } ?>
