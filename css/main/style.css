@@ -19,32 +19,42 @@ body {
   background: #e6ecf0;
 }
 
-/*ここまで*/
+/*カーソルポインタを指マークにする*/
+.yubi {
+  cursor : pointer;
+}
 
-/*#page {
-  position: relative;
-  overflow-x: hidden;
-  -webkit-transition: 0.5s;
-  -o-transition: 0.5s;
-  transition: 0.5s;
-}*/
-/*.offcanvas #page {
-  overflow: hidden;
-  position: absolute;
-}*/
-/*.offcanvas #page:after {
-  -webkit-transition: 2s;
-  -o-transition: 2s;
-  transition: 2s;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 101;
-  background: rgba(0, 0, 0, 0.7);
-  content: "";
-}*/
+/*検索窓スタイル*/
+#form02{
+    background-color: white;
+    width:200px;
+    height: 20px;
+    border: 1px green solid;
+}
+#form02 input{
+    vertical-align: top;
+    margin: 0px;
+    height: 100%;
+    box-sizing: border-box;
+    background-color: transparent;
+}
+#form02{
+    border-radius: 10px;
+}
+#input02{
+    border: none;
+    width: 170px;
+    padding-left: 10px;
+}
+#submit02{
+    width: 30px;
+    border: none;
+    background-image: url(画像へのパス);
+    background-position: center;
+    background-size: auto 90%;
+    background-repeat: no-repeat;
+}
+/*検索窓スタイルここまで*/
 
 a {
   color: #F73859;
@@ -2206,17 +2216,19 @@ textarea{
 }
 .signin .avatar {
   width: 100px;
-  height: 100px;
+  font-size: 20px;
+/*  height: 100px;*/
+  color: white;
   margin: 0 auto 35px auto;
-  border: 5px solid #fff;
+/*  border: 5px solid #fff;
   -webkit-border-radius: 100%;
   -moz-border-radius: 100%;
   border-radius: 100%;
   -webkit-pointer-events: none;
   -moz-pointer-events: none;
-  pointer-events: none;
+  pointer-events: none;*/
 }
-.signin .avatar:before {
+/*.signin .avatar:before {
   content: "\f272";
   text-align: center;
   font-family: Ionicons;
@@ -2224,7 +2236,7 @@ textarea{
   height: 100%;
   line-height: 100px;
   font-size: 5em;
-}
+}*/
 .signin .inputrow {
   position: relative;
 }
