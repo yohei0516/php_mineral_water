@@ -1,155 +1,11 @@
 <?php 
+
   require('function.php');
   login_check();
-  //DBの接続
   require('dbconnect.php');
+  require('page.php');
+  require('display.php');
 
-
-//----- ページング処理
-$page = "";
-//パラメータが存在していたらページ番号代入
-if(isset($_GET["page"])){
-
-  $page = $_GET["page"];
-}else{
-//存在しないときはページ１とする
-  $page = 1;
-}
-
-//１以下のページ番号を入力されたら数字を１にする
-//カンマ区切りで羅列された数字の中で最大の数字
-$page = max($page,1);
-
-//1ページ分の表示件数
-$page_row = 100;
-
-//データの件数から最大ページ数を計算する
-//AS `cnt`を使うとfetchしたデータから取り出したCOUNT(*)データが
-$sql = "SELECT COUNT(*)  AS `cnt` FROM `kotobato_posts` WHERE `delete_flag`=0";
-$page_stmt = $dbh->prepare($sql);
-$page_stmt->execute();
-
-$record_count = $page_stmt->fetch(PDO::FETCH_ASSOC);
-
-// var_dump($record_count);
-// exit;
-// 小数点の繰り上げ
-$all_page_number = ceil($record_count['cnt'] / $page_row);
-
-//パラメータのページ番号が最大ページを超えていれば、強制的に最後のページとする。
-//min カンマ区切りの数字の羅列の中から最小の数字を取得する。
-$page = min($page,$all_page_number);
-
-//$startは表示するデータの表示開始場所
-  $start = ($page-1) * $page_row;
-// var_dump($all_page_number);
-
-
-  //----表示用のデータ取得-----
-  try{
-    // ログインしている人の情報を取得
-     $sql = "SELECT * FROM `kotobato_members` WHERE `id`=".$_SESSION["id"];
-
-     $stmt = $dbh->prepare($sql);
-     $stmt->execute();
-
-     $login_member = $stmt->fetch(PDO::FETCH_ASSOC);
-     // var_dump($login_member);
-     // 一覧用の情報を取得
-     // テーブル結合
-     // ORDER BY 最新順位並び替え
-     // 論理削除に対応、delete_flag = 0のものだけ取得
-    $sql = "SELECT `kotobato_posts`.*,`kotobato_members`.`nick_name` FROM `kotobato_posts` INNER JOIN `kotobato_members` ON `kotobato_posts`.`member_id`=`kotobato_members`.`id` WHERE `delete_flag`=0 ORDER BY `kotobato_posts`.`modified` DESC LIMIT ".$start.",".$page_row;
-
-     $stmt = $dbh->prepare($sql);
-     $stmt->execute();
-
-     // 一覧表示用の配列を用意
-     $post_list = array();
-
-     // 複数行のデータを取得するためループ
-     while (1) {
-      $one_post = $stmt->fetch(PDO::FETCH_ASSOC);
-      // var_dump($one_post);
-      if($one_post == false){
-      break;
-     }else{
-
-      // like数を求めるSQL文
-      $like_sql = "SELECT COUNT(*)as `like_count` FROM `kotobato_likes` WHERE `post_id`=".$one_post["id"];
-
-      // SQL文実行
-      $like_stmt = $dbh->prepare($like_sql);
-      $like_stmt->execute();
-      $like_number = $like_stmt->fetch(PDO::FETCH_ASSOC);
-
-
-      // $one_tweetの中身
-      // $one_tweet["tweet"]つぶやき
-      // $one_tweet["member_id"]つぶやいた人のid
-      // $one_tweet["nick_name"]つぶやいた人のニックネーム
-      // $one_tweet["picture_path"]つぶやいた人のプロフィール画像
-      // $one_tweet["modified"]つぶやいた日時
-
-      //1行分のデータに新しいキーを用意して、like数を代入
-      $one_post["like_count"] = $like_number["like_count"];
-
-      // ログインしている人がLikeしているかどうかの情報を取得
-      $login_like_sql = "SELECT COUNT(*) as `like_count` FROM `kotobato_likes` WHERE `post_id`=".$one_post['id']." AND `member_id` =".$_SESSION["id"];
-
-      // SQL文実行
-      $login_like_stmt = $dbh->prepare($login_like_sql);
-      $login_like_stmt->execute();
-
-      // フェッチして取得
-      $login_like_number = $login_like_stmt->fetch(PDO::FETCH_ASSOC);
-
-      $one_post["login_like_flag"] = $login_like_number["like_count"];
-
-// var_dump($one_post["login_like_flag"]);
-
-      // データが取得できている
-      $post_list[] = $one_post;
-      // var_dump($post_list);
-      // exit;
-     }
-     // var_dump($one_post);
-    }
-
-
-    // followingの数
-    $following_sql ="SELECT COUNT(*) as `cnt` FROM `kotobato_follows` WHERE `member_id` =".$_SESSION["id"];
-    $following_stmt = $dbh->prepare($following_sql);
-    $following_stmt->execute();
-    $following = $following_stmt->fetch(PDO::FETCH_ASSOC);
-
-    // Followerの数
-    $follower_sql ="SELECT COUNT(*) as `cnt` FROM `kotobato_follows` WHERE `follower_id` =".$_SESSION["id"];
-    $follower_stmt = $dbh->prepare($follower_sql);
-    $follower_stmt->execute();
-    $follower = $follower_stmt->fetch(PDO::FETCH_ASSOC);
-
-
-    //     // var_dump($follower);
-    //タグの一覧を取得
-    // $tag_sql = "SELECT * FROM `kotobato_hashtag`";
-    // $tag_stmt = $dbh->prepare($tag_sql);
-    // $tag_stmt->execute();
-    // $tag_list = array();
-    // var_dump($tag_list);
-//     while(1){
-//       $one_tag = $tag_stmt->fetch(PDO::FETCH_ASSOC);
-// // var_dump($tag_stmt);
-//       if($one_tag == false){
-//         break;
-//       }
-//       $tag_list[] = $one_tag;
-//     }
-   }catch(Exception $e){
-   	echo 'SQL実行エラー:'.$e->getMessage();
-    exit();
-  }
-// var_dump($one_post);
  ?>
 
 
@@ -256,54 +112,92 @@ $page = min($page,$all_page_number);
         </div>
 				<div class="col-md-12">					
 					<ul id="gtco-post-list">
-						<?php foreach ($post_list as $one_post) {?>
-						<li class="full entry animate-box" data-animate-effect="fadeIn">
-							<a href="picture_path/<?php echo $one_post["post_picture"];?>">
-								<div class="entry-img" style="background-image: url(images/img_1.jpg"></div>
-								<div class="entry-desc">
-									<h3><?php echo $one_post["word"]; ?></h3><br>
-									<p><?php echo $one_post["explanation"]; ?></p>
-								</div>
-							</a>
 
-							<a href="profile.php?member_id=<?php echo $one_post["member_id"];?>">
-		          <?php echo $one_post["nick_name"]; ?>
-		          </a>
+          <?php for ($i=1; $i <=6 ; $i++) { 
+                  foreach($display_list as $post_big){
+              if ($post_big["row"] == $i) {?>
+                              
+      						<li class="full entry animate-box" data-animate-effect="fadeIn">
+      							<a href="picture_path/<?php echo $post_big["post_picture"];?>">
+      								<div class="entry-img" style="background-image: url(images/img_1.jpg"></div>
+      								<div class="entry-desc">
+      									<h3><?php echo $post_big["word"]; ?></h3><br>
+      									<p><?php echo $post_big["explanation"]; ?></p>
+      								</div>
+      							</a>
 
-							<?php if ($one_post["login_like_flag"] == 0){?>
-							<a href="like.php?like_post_id=<?php echo $one_post["id"];?>&page=<?php echo $page; ?>" class="post-meta">いいね</a>
-							<?php }else{?>
+      							<a href="profile.php?member_id=<?php echo $post_big["member_id"];?>"><br>
+      		          <?php echo $post_big["nick_name"]; ?>
+      		          </a>
 
-							<a href="like.php?unlike_post_id=<?php echo $one_post["id"];?>&page=<?php echo $page; ?>">だめだね</a>
-              <?php } ?>
-              <?php if($one_post["like_count"] > 0){echo $one_post["like_count"];} ?>
-							<span class="date-posted">お気に入り保存</span>
-						</li>
-						<?php } ?>
+      							<?php if ($post_big["login_like_flag"] == 0){?>
+      							<a href="like.php?like_post_id=<?php echo $post_big["id"];?>&page=<?php echo $page; ?>" class="post-meta">いいね</a>
+      							<?php }else{?>
 
-						<li class="two-third entry animate-box" data-animate-effect="fadeIn"> 
-							<a href="images/img_2.jpg">
-								<div class="entry-img" style="background-image: url(images/img_2.jpg"></div>
-								<div class="entry-desc">
-									<h3>Stay Hungry. Stay Foolish.</h3> <br>
-									<p>It wasn't all romantic. I didn't have a dorm room, so I slept on the floor in friends' rooms, I returned coke bottles for the 5¢ deposits to buy food with, and I would walk the 7 miles across town every Sunday night to get one good meal a week at the Hare Krishna temple. I loved it. And much of what I stumbled into by following my curiosity and intuition turned out to be priceless later on. Let me give you one example:</p>
-								</div>
-							</a>
-							<a href="single.html" class="post-meta">いいね  <span class="date-posted">お気に入り保存</span></a>
-						</li>
+      							<a href="like.php?unlike_post_id=<?php echo $post_big["id"];?>&page=<?php echo $page; ?>">だめだね</a>
+                    <?php } ?>
+                    <?php if($post_big["like_count"] > 0){echo $post_big["like_count"];} ?>
+      							<span class="date-posted">お気に入り保存</span>
+      						</li>
 
+              <?php }
+            }?>
+
+            <?php foreach ($display_list as $post_middle) {
+              if ($post_middle["row"] == $i) {?>
+    						<li class="two-third entry animate-box" data-animate-effect="fadeIn"> 
+    							<a href="picture_path/<?php echo $post_middle["post_picture"];?>">
+    								<div class="entry-img" style="background-image: url(images/img_2.jpg"></div>
+    								<div class="entry-desc">
+    									<h3><?php echo $post_middle["word"]; ?></h3> <br>
+    									<p><?php echo $post_middle["explanation"]; ?></p>
+    								</div>
+    							</a>
+
+                  <a href="profile.php?member_id=<?php echo $post_middle["member_id"];?>"><br>
+                  <?php echo $post_middle["nick_name"]; ?>
+                  </a>             
+
+                  <?php if ($post_middle["login_like_flag"] == 0){?>
+                  <a href="like.php?like_post_id=<?php echo $post_middle["id"];?>&page=<?php echo $page; ?>" class="post-meta">いいね</a>
+                  <?php }else{?>
+
+                <a href="like.php?unlike_post_id=<?php echo $post_middle["id"];?>&page=<?php echo $page; ?>">だめだね</a>
+                  <?php } ?>
+                  <?php if($post_middle["like_count"] > 0){echo $post_middle["like_count"];} ?>
+                  <span class="date-posted">お気に入り保存</span>
+    						</li>
+              <?php }
+            } ?>
+
+            
+            <?php foreach ($display_list as $post_small) {
+              if ($post_small["row"] == $i) {?>
 						<li class="one-third entry animate-box" data-animate-effect="fadeIn">
-							<a href="images/img_3.jpg">
+              <a href="picture_path/<?php echo $post_small["post_picture"];?>">
 								<div class="entry-img" style="background-image: url(images/img_3.jpg"></div>
 								<div class="entry-desc">
-									<h3>Time flies so quickly!!!</h3> <br>
-									<p>この地上で過ごせる時間には限りがあります。<br>	
-										本当に大事なことを本当に一生懸命できる機会は、
-										二つか三つくらいしかないのです。   </p>
+									<h3><?php echo $post_small["word"]; ?></h3> <br>
+									<p><?php echo $post_small["explanation"]; ?></p>
 								</div>
 							</a>
-							<a href="single.html" class="post-meta">いいね  <span class="date-posted">お気に入り保存</span></a>
-						</li>
+
+              <a href="profile.php?member_id=<?php echo $post_small["member_id"];?>"><br>
+              <?php echo $post_small["nick_name"]; ?>
+              </a>
+
+              <?php if ($post_small["login_like_flag"] == 0){?>
+              <a href="like.php?like_post_id=<?php echo $post_small["id"];?>&page=<?php echo $page; ?>" class="post-meta">いいね</a>
+              <?php }else{?>
+
+            <a href="like.php?unlike_post_id=<?php echo $post_small["id"];?>&page=<?php echo $page; ?>">だめだね</a>
+              <?php } ?>
+              <?php if($post_small["like_count"] > 0){echo $post_small["like_count"];} ?>
+              <span class="date-posted">お気に入り保存</span>
+            </li>
+            <?php } 
+          }
+        } ?>
 
 						<li class="one-third entry animate-box" data-animate-effect="fadeIn">
 							<a href="images/img_4.jpg">
@@ -338,6 +232,7 @@ $page = min($page,$all_page_number);
 					</ul>	
 				</div>
 			</div>
+
 
 			<div class="row">
 				<div class="col-md-12 text-center">
