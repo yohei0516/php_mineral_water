@@ -82,145 +82,97 @@
 					<ul id="gtco-post-list">
 
           <?php for ($i=1; $i <=6 ; $i++) { 
-                  foreach($display_list as $post_big){
-              if ($post_big["row"] == $i) {?>
+            foreach($display_list as $post){
+             if($post["row"] == $i){
+              if ($post["size"] == "B") {?>
                               
       						<li class="full entry animate-box" data-animate-effect="fadeIn">
-      							<a href="picture_path/<?php echo $post_big["post_picture"];?>">
+      							<a href="picture_path/<?php echo $post["post_picture"];?>">
       								<div class="entry-img" style="background-image: url(images/img_1.jpg"></div>
       								<div class="entry-desc">
-      									<h3><?php echo $post_big["word"]; ?></h3><br>
-      									<p><?php echo $post_big["explanation"]; ?></p>
+      									<h3><?php echo $post["word"]; ?></h3><br>
+
+      									<p><?php echo $post["explanation"]; ?></p>
       								</div>
       							</a>
 
-      							<a href="profile.php?member_id=<?php echo $post_big["member_id"];?>"><br>
-      		          <?php echo $post_big["nick_name"]; ?>
+      							<a href="profile.php?member_id=<?php echo $post["member_id"];?>"><br>
+      		          <?php echo $post["nick_name"]; ?>
       		          </a>
 
-      							<?php if ($post_big["login_like_flag"] == 0){?>
-      							<a href="like.php?like_post_id=<?php echo $post_big["id"];?>&page=<?php echo $page; ?>" class="post-meta">いいね</a>
+      							<?php if ($post["login_like_flag"] == 0){?>
+      							<a href="like.php?like_post_id=<?php echo $post["id"];?>&page=<?php echo $page; ?>" class="post-meta">いいね</a>
       							<?php }else{?>
 
-      							<a href="like.php?unlike_post_id=<?php echo $post_big["id"];?>&page=<?php echo $page; ?>">だめだね</a>
+      							<a href="like.php?unlike_post_id=<?php echo $post["id"];?>&page=<?php echo $page; ?>">だめだね</a>
                     <?php } ?>
-                    <?php if($post_big["like_count"] > 0){echo $post_big["like_count"];} ?>
+                    <?php if($post["like_count"] > 0){echo $post["like_count"];} ?>
       							<span class="date-posted">お気に入り保存</span>
       						</li>
 
               <?php }
-            }?>
 
-            <?php foreach ($display_list as $post_middle) {
-              if ($post_middle["row"] == $i) {?>
+              if ($post["size"] == "M") {?>
+
     						<li class="two-third entry animate-box" data-animate-effect="fadeIn"> 
-    							<a href="picture_path/<?php echo $post_middle["post_picture"];?>">
+    							<a href="picture_path/<?php echo $post["post_picture"];?>">
     								<div class="entry-img" style="background-image: url(images/img_2.jpg"></div>
     								<div class="entry-desc">
-    									<h3><?php echo $post_middle["word"]; ?></h3> <br>
-    									<p><?php echo $post_middle["explanation"]; ?></p>
+    									<h3><?php echo $post["word"]; ?></h3> <br>
+    									<p><?php echo $post["explanation"]; ?></p>
     								</div>
     							</a>
 
-                  <a href="profile.php?member_id=<?php echo $post_middle["member_id"];?>"><br>
-                  <?php echo $post_middle["nick_name"]; ?>
+                  <a href="profile.php?member_id=<?php echo $post["member_id"];?>"><br>
+                  <?php echo $post["nick_name"]; ?>
                   </a>             
 
-                  <?php if ($post_middle["login_like_flag"] == 0){?>
-                  <a href="like.php?like_post_id=<?php echo $post_middle["id"];?>&page=<?php echo $page; ?>" class="post-meta">いいね</a>
+                  <?php if ($post["login_like_flag"] == 0){?>
+                  <a href="like.php?like_post_id=<?php echo $post["id"];?>&page=<?php echo $page; ?>" class="post-meta">いいね</a>
                   <?php }else{?>
 
-                <a href="like.php?unlike_post_id=<?php echo $post_middle["id"];?>&page=<?php echo $page; ?>">だめだね</a>
+                <a href="like.php?unlike_post_id=<?php echo $post["id"];?>&page=<?php echo $page; ?>">だめだね</a>
                   <?php } ?>
-                  <?php if($post_middle["like_count"] > 0){echo $post_middle["like_count"];} ?>
+                  <?php if($post["like_count"] > 0){echo $post["like_count"];} ?>
                   <span class="date-posted">お気に入り保存</span>
     						</li>
               <?php }
-            } ?>
-
             
-            <?php foreach ($display_list as $post_small) {
-              if ($post_small["row"] == $i) {?>
+             if ($post["size"] == "SM" || $post["size"] == "S"){?>
+            
 						<li class="one-third entry animate-box" data-animate-effect="fadeIn">
-              <a href="picture_path/<?php echo $post_small["post_picture"];?>">
+              <a href="picture_path/<?php echo $post["post_picture"];?>">
 								<div class="entry-img" style="background-image: url(images/img_3.jpg"></div>
 								<div class="entry-desc">
-									<h3><?php echo $post_small["word"]; ?></h3> <br>
-									<p><?php echo $post_small["explanation"]; ?></p>
+									<h3><?php echo $post["word"]; ?></h3> <br>
+									<p><?php echo $post["explanation"]; ?></p>
 								</div>
 							</a>
 
-              <a href="profile.php?member_id=<?php echo $post_small["member_id"];?>"><br>
-              <?php echo $post_small["nick_name"]; ?>
+              <a href="profile.php?member_id=<?php echo $post["member_id"];?>"><br>
+              <?php echo $post["nick_name"]; ?>
               </a>
 
-              <?php if ($post_small["login_like_flag"] == 0){?>
-              <a href="like.php?like_post_id=<?php echo $post_small["id"];?>&page=<?php echo $page; ?>" class="post-meta">いいね</a>
+              <?php if ($post["login_like_flag"] == 0){?>
+              <a href="like.php?like_post_id=<?php echo $post["id"];?>&page=<?php echo $page; ?>" class="post-meta">いいね</a>
               <?php }else{?>
 
-            <a href="like.php?unlike_post_id=<?php echo $post_small["id"];?>&page=<?php echo $page; ?>">だめだね</a>
+            <a href="like.php?unlike_post_id=<?php echo $post["id"];?>&page=<?php echo $page; ?>">だめだね</a>
               <?php } ?>
-              <?php if($post_small["like_count"] > 0){echo $post_small["like_count"];} ?>
+              <?php if($post["like_count"] > 0){echo $post["like_count"];} ?>
               <span class="date-posted">お気に入り保存</span>
             </li>
             <?php } 
           }
+         }
         } ?>
-
-						<li class="one-third entry animate-box" data-animate-effect="fadeIn">
-							<a href="images/img_4.jpg">
-								<div class="entry-img" style="background-image: url(images/img_4.jpg"></div>
-								<div class="entry-desc">
-									<h3>戯れて生きるな</h3>
-									<p>あなたの時間は限られている。だから、誰かほかの人の人生を生きることでムダな時間を費やさないでほしい。  </p>
-								</div>
-							</a>
-							<a href="single.html" class="post-meta">いいね  <span class="date-posted">お気に入り保存</span></a>
-						</li>
-						<li class="one-third entry animate-box" data-animate-effect="fadeIn">
-							<a href="images/img_5.jpg">
-								<div class="entry-img" style="background-image: url(images/img_5.jpg"></div>
-								<div class="entry-desc">
-									<h3>音楽に生きる</h3>
-									<p>生きることは音楽的であること。体内の血が踊り出すところから始まるすべての生命がリズムを刻んでいる。君は音楽を感じているか？ </p>
-								</div>
-							</a>
-							<a href="single.html" class="post-meta">いいね  <span class="date-posted">お気に入り保存</span></a>
-						</li>
-						<li class="one-third entry animate-box" data-animate-effect="fadeIn">
-							<a href="images/img_6.jpg">
-								<div class="entry-img" style="background-image: url(images/img_6.jpg"></div>
-								<div class="entry-desc">
-									<h3>もっと単純に</h3>
-									<p>人生は複雑ではない。私達の方が複雑だ。人生は単純で、単純であることが正しいことなのだ</p>
-								</div>
-							</a>
-							<a href="single.html" class="post-meta">いいね  <span class="date-posted">お気に入り保存</span></a>
-						</li>
-					</ul>	
-				</div>
-			</div>
 
 
 			<div class="row">
 				<div class="col-md-12 text-center">
 					<nav aria-label="Page navigation">
 					  <ul class="pagination">
-					    <li>
-					      <a href="#" aria-label="Previous">
-					        <span aria-hidden="true">&laquo;</span>
-					      </a>
-					    </li>
-					    <li class="active"><a href="#">1</a></li>
-					    <li><a href="#">2</a></li>
-					    <li><a href="#">3</a></li>
-					    <li><a href="#">4</a></li>
-					    <li><a href="#">5</a></li>
-					    <li>
-					      <a href="#" aria-label="Next">
-					        <span aria-hidden="true">&raquo;</span>
-					      </a>
-					    </li>
+
 					  </ul>
 					</nav>
 				</div>
