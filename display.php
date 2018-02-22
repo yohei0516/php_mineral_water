@@ -25,6 +25,10 @@
      $row_big = array();
      $row_middle = array();
      $row_small = array();
+     $size_big = array();
+     $size_middle = array();
+     $size_sm = array();
+     $size_small = array();
 
      $type = 'B';
      $empty_big = 0;
@@ -63,26 +67,36 @@
       $login_like_number = $login_like_stmt->fetch(PDO::FETCH_ASSOC);
       $one_post["login_like_flag"] = $login_like_number["like_count"];
 
+     
+
+     
+
+
+
         if($one_post["like_count"] >= 10){
           $row_big["row"] = $b*3 - 2;
-          $post_big[] = array_merge($row_big,$one_post);
+          $size_big["size"] = "B";
+          $post_big[] = array_merge($row_big,$one_post,$size_big);
           $b++;         
 
         }elseif (10 > $one_post["like_count"] && $one_post["like_count"] > 1) {
           $row_middle["row"] = $m*3 - 1;
-          $post_middle[] = array_merge($row_middle,$one_post);
+          $size_middle["size"] = "M";
+          $post_middle[] = array_merge($row_middle,$one_post,$size_middle);
           $m++;
 
         }else{
           if(($n+3)%4 == 0){
           $row_small["row"] = $sm*3 -1;
-          $post_small[] = array_merge($row_small,$one_post);          
+          $size_sm["size"] = "SM";
+          $post_small[] = array_merge($row_small,$one_post,$size_sm);          
           $sm++;
           $s++;
           }
           if(($n+3)%4 == 1 || ($n+3)%4 == 2 || ($n+3)%4 == 3){
           $row_small["row"] = $s*3;
-          $post_small[] = array_merge($row_small,$one_post);
+          $size_small["size"] = "S";
+          $post_small[] = array_merge($row_small,$one_post,$size_small);
           }
         $n++;
         }
@@ -189,7 +203,7 @@
 
   try{
     // echo "<pre>";
-    //  var_dump($post_small);
+    //  var_dump($display_list);
     // echo "</pre>";
     //   exit;
      // var_dump($one_post);
