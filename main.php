@@ -50,42 +50,10 @@
 	<div class="gtco-loader"></div>
 	
 	<div id="page">
-<<<<<<< HEAD:main.php
 
-		<!-- ナビバー呼び出し -->
-		 <?php include('nav.php');?>
-=======
-	<nav class="gtco-nav" role="navigation">
-		<div class="container">
-			<div class="row">
-				<div class="col-xs-2 text-left">
-					<div id="gtco-logo"><a href="main.html">コトバと<span>.</span></a></div>
-				</div>
-				<div class="col-xs-10 text-right menu-1">
-					<ul>
-						<!-- プルダウンできるコード -->
-						<!--<li class="has-dropdown">
-							<a href="category.html">投稿</a>
-							<ul class="dropdown">
-								<li><a href="#">Python</a></li>
-								<li><a href="#">Javascript</a></li>
-								<li><a href="#">HTML5/CSS3</a></li>
-								<li><a href="#">Django</a></li>
-							</ul>
-						</li> -->
-						<li><a id="modal-open" class="buttons button button-link">投稿</a></li>
-						<li><a href="#">ジャンル</a></li>
-						<li><a href="#">検索</a></li>
-						<li><a href="#">プロフィール</a></li>
-						<li><a href="index.php">ログアウト</a></li>
-					</ul>
-				</div>
-			</div>
-			
-		</div>
-	</nav>
->>>>>>> c41929d5d890d4bcc1251268f06ac965e4c7dc5d:kotobato/main.php
-
+	<!-- ナビバー呼び出し -->
+	<?php include('nav.php');?>
+	
 	<header>
 <!-- 	<header id="gtco-header" class="gtco-cover" role="banner" style="background-image:url(images/img_1.jpg);" data-stellar-background-ratio="0.5">
 		<div class="overlay"></div>

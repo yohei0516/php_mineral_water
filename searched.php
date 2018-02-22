@@ -45,35 +45,9 @@
   <div class="gtco-loader"></div>
   
   <div id="page">
-  <nav class="gtco-nav" role="navigation">
-    <div class="container">
-      <div class="row">
-        <div class="col-xs-8 text-left">
-          <div id="gtco-logo"><a href="main.html">コトバと<span>.</span></a></div>
-        </div>
-        <div class="col-xs-10 text-right menu-1">
-          <ul>
-            <!-- プルダウンできるコード -->
-            <!--<li class="has-dropdown">
-              <a href="category.html">投稿</a>
-              <ul class="dropdown">
-                <li><a href="#">Python</a></li>
-                <li><a href="#">Javascript</a></li>
-                <li><a href="#">HTML5/CSS3</a></li>
-                <li><a href="#">Django</a></li>
-              </ul>
-            </li> -->
-            <li><a href="#">投稿</a></li>
-            <li><a href="#">ジャンル</a></li>
-            <li><a href="#">検索</a></li>
-            <li><a href="#">プロフィール</a></li>
-            <li><a href="#">ログアウト</a></li>
-          </ul>
-        </div>
-      </div>
-      
-    </div>
-  </nav>
+ 
+  <!-- ナビバー呼び出し -->
+  <?php include('nav.php');?>
   
 <div id="fh5co-blog-section">
     <div class="container">
@@ -81,8 +55,8 @@
 
 
 
-<!--          フローティングメニューが入る -->
-          <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+<!-- フローティングメニューが入る -->
+ <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
 <div class="container" >
   <div class="row">
     <!-- <div class="col-xs-12 col-md-7 col-lg-offset-3 col-lg-9" style="margin-top:245px;">
