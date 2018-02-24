@@ -19,35 +19,45 @@ body {
   background: #e6ecf0;
 }
 
-/*ここまで*/
+/*カーソルポインタを指マークにする*/
+.yubi {
+  cursor : pointer;
+}
 
-
-
-
-/*#page {
-  position: relative;
-  overflow-x: hidden;
-  -webkit-transition: 0.5s;
-  -o-transition: 0.5s;
-  transition: 0.5s;
-}*/
-/*.offcanvas #page {
-  overflow: hidden;
-  position: absolute;
-}*/
-/*.offcanvas #page:after {
-  -webkit-transition: 2s;
-  -o-transition: 2s;
-  transition: 2s;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 101;
-  background: rgba(0, 0, 0, 0.7);
-  content: "";
-}*/
+/*検索窓スタイル*/
+#form02{
+    background-color: white;
+    width:300px;
+    height: 25px;
+    border: 1px solid #3b5998;
+}
+#form02 input{
+    vertical-align: top;
+    margin: 0px;
+    height: 100%;
+    box-sizing: border-box;
+    background-color: transparent;
+}
+#form02{
+    border-radius: 5px;
+    margin-top: 9px;
+    margin-bottom: -30px;
+    margin-left: -38;
+}
+#input02{
+    border: none;
+    width: 259px;
+    padding-left: 10px;
+}
+#submit02{
+    width: 30px;
+    border: none;
+    background-image: url(../../images/search.png);
+    background-position: center;
+    background-size: auto 70%;
+    background-repeat: no-repeat;
+}
+/*検索窓スタイルここまで*/
 
 a {
   color: #F73859;
