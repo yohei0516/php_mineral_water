@@ -106,7 +106,7 @@
           <ul id="gtco-post-list">
             <li class="full entry animate-box" data-animate-effect="fadeIn">
               <!-- <a href="images/img_1.jpg"> -->
-              <img src="ザキさんのフォルダ/<?php echo $tweet["post_picture"]; ?>" width="100" height="100">
+              <img src="post_picture/<?php echo $tweet["post_picture"]; ?>" >
                 <!-- <div class="entry-img" style="background-image: url(images/img_1.jpg"></div> -->
                 <div class="entry-desc">
                   <h3> <?php echo $tweet["word"]; ?><!--  世界はいつも、決定的瞬間だ。  --></h3> <br>
