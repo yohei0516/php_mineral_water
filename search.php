@@ -1,3 +1,4 @@
+
 <?php
   // セッションスタート
   require('function.php');
@@ -12,7 +13,7 @@
   Twitter: http://twitter.com/gettemplateco
   URL: http://gettemplates.co
 -->
-<html>
+<html lang="ja">
   <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -50,7 +51,7 @@
  
   <!-- ナビバー呼び出し -->
   <?php include('nav.php');?>
-
+  <!-- 検索処理 -->
   <?php
   // POSTデータを受け取る
   $id = $_POST['id'];
@@ -64,7 +65,7 @@
     $pdo = new PDO($dsn, $user, $password);
 
     // :idは、プレースホルダ
-    $sql = "SELECT * FROM `kotobato_posts` WHERE id = :id";
+    $sql = "SELECT * FROM `kotobato_posts` WHERE word = :id";
 
     // プリペアドステートメントを作成
     $stmt = $pdo->prepare($sql);
@@ -72,15 +73,20 @@
     $stmt -> bindParam(":id",$id);
     $stmt -> execute(); //実行
 
+    $search_list = array();
     // 1行ずつ取得
     while($rec = $stmt->fetch(PDO::FETCH_ASSOC)){
-
-      // テーブルの項目名を指定して値を表示
-      echo $rec['id'];
-      echo $rec['word'];
-      echo $rec['explanation'];
-      echo '<br>';
+        if ($rec == false){
+          break;
+        }
+        $search_list[] = $rec;
     }
+      // テーブルの項目名を指定して値を表示
+      // echo $rec['id'];
+      // echo $rec['word'];
+      // echo $rec['explanation'];
+      // echo '<br>';
+    // }
 
   }catch (PDOException $e) {
     // UTF8に文字エンコーディングを変換
@@ -90,45 +96,56 @@
   // $pdo = null;
 ?>
   
-<div id="fh5co-blog-section">
-  <div class="container">
-    <div class="row" >
-      <!-- フローティングメニューが入る -->
-      <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-      <div class="container" >
-        <div class="row">
-          <div class="col-xs-12 col-md-7 col-lg-12" style="margin-top:245px;">
-            <div class="mypage-heading">
-              <h2 style="float:left;">検索結果&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h2>
-                <p style="float: left; margin-bottom:26px; padding-top:6px;">日付順
-                  <select class="day">
-                    <option value="down">降順</option>
-                    <option value="up">昇順</option>
-                  </select>&nbsp;&nbsp;&nbsp;
-                </p>
-                <p style="margin-bottom:26px; padding-top:6px;">いいね順
-                  <select class="likes">
-                    <option value="more">多い順</option>
-                    <option value="less">少ない順</option>
-                  </select>
-                </p> 
-            </div>
-            <div class="mypage-inner">
-              <div class="desc" style="background-color: white;">
-                <a href="#"><img class="img-responsive" align="left" src="images/img_1.jpg" alt="mypage" width="200" height="150" style="margin-right: 15px;margin-top: 20px;"></a>
-                <br>
-                <h3 align="left" style="font-weight: bold;"><?php echo $_rec['word']; ?></h3>
-                <p  align="left" style="font-weight: bold;"><?php echo $_rec['explanation']; ?></p>
-                <br>
-                <p align="right" style="margin-bottom:5px;"><a class="fa fa-leaf" aria-hidden="true" style="color:black"></a><a href="#" align="right" style="color:black;" class="fa fa-star-o" aria-hidden="true"></a></p>
-              </div>
-            </div>
-          </div>
+  <div id="gtco-main">
+    <div class="container">
+
+      <?php foreach ($search_list as $tweet) { ?>
+
+      <div class="row row-pb-md">
+        <div class="col-md-12">
+          <ul id="gtco-post-list">
+            <li class="full entry animate-box" data-animate-effect="fadeIn">
+              <!-- <a href="images/img_1.jpg"> -->
+              <img src="ザキさんのフォルダ/<?php echo $tweet["post_picture"]; ?>" width="100" height="100">
+                <!-- <div class="entry-img" style="background-image: url(images/img_1.jpg"></div> -->
+                <div class="entry-desc">
+                  <h3> <?php echo $tweet["word"]; ?><!--  世界はいつも、決定的瞬間だ。  --></h3> <br>
+                  <p> <?php echo $tweet["explanation"]; ?><!-- 写真っていうのはねぇ。いい被写体が来たっ、て思ってからカメラ向けたらもう遅いんですよ。その場の空気に自分が溶け込めば、二、三秒前に来るのがわかるんですよ。その二、三秒のあいだに絞りと、シャッタースピード、距離なんかを合わせておくんです。それで撮るんですよ。 --></p>
+                </div>
+              </a>
+              <a href="#" class="post-meta">いいね  <span class="date-posted">お気に入り保存</span></a>
+            </li>
+          </ul> 
+        </div>
+      </div>
+
+      <?php } ?>
+
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <nav aria-label="Page navigation">
+            <ul class="pagination">
+              <li>
+                <a href="#" aria-label="Previous">
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+              </li>
+              <li class="active"><a href="#">1</a></li>
+              <li><a href="#">2</a></li>
+              <li><a href="#">3</a></li>
+              <li><a href="#">4</a></li>
+              <li><a href="#">5</a></li>
+              <li>
+                <a href="#" aria-label="Next">
+                  <span aria-hidden="true">&raquo;</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
         </div>
       </div>
     </div>
   </div>
-</div>
   
   <footer id="gtco-footer" role="contentinfo">
     <div class="container">
