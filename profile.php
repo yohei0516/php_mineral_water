@@ -2,7 +2,11 @@
 
  session_start();
  require('dbconnect.php');
-
+ require('display.php');
+            // echo "<pre>";
+            // var_dump($display_list);
+            // echo "</pre>";
+            // exit;
 
 //GET送信された,member_idをつかって、プロフィール情報をmenbersテーブルから取得する。
 // session_idだとログインされている人のIDになってしまう
@@ -67,6 +71,12 @@
     //フォロー解除を押す前の状態に戻す
     header("Location: profile.php?member_id=".$_GET['member_id']);
   }
+
+            // echo "<pre>";
+            // var_dump($_GET);
+            // echo "</pre>";
+
+            // exit;
 
  ?>
 
@@ -169,7 +179,7 @@
                 </div>
                 <div class="info">
                     <div class="title" style="text-align: center;">
-                        <h3 target="_blank" href="#" style="color:black;font-family: arial, sans-serif;font-weight: bold;">レベッカ</h>
+                        <h3 target="_blank" href="#" style="color:black;font-family: arial, sans-serif;font-weight: bold;"><?php echo $profile_member["nick_name"]; ?></h>
                         <a href="#" style="font-size:15px;color:black;font-family: arial, sans-serif;"><br>プロフィールを編集</a>
                     </div>
                 </div>
@@ -189,11 +199,12 @@
 					        <?php } ?>
 
                 <div class="bottom" style="text-align: center;">
-                    <a class="posts" href="#" value="投稿" style="color:#7f7f7f;font-weight: bold;">投稿</a>
-                    <a class="favoritte" href="#" value="お気に入り" style="color:#7f7f7f;font-weight: bold;">お気に入り</a>
-                    <a class="follows"　href="#" value="フォロー" style="color:#7f7f7f;font-weight: bold;">フォロー</a>
-                    <a class="following"　href="#" value="フォロワー" style="color:#7f7f7f;font-weight: bold;">フォロワー</a>
+                    <a class="posts" href="profile.php" style="color:#7f7f7f;font-weight: bold;">投稿</a>
+                    <a class="favorite" href="favorite.php?id=<?php echo $profile_member["id"];?>" style="color:#7f7f7f;font-weight: bold;">お気に入り</a>
+
+          <a href="follows.php">フォロー<span class="badge badge-pill badge-default"><?php echo $follower["cnt"]; ?></span></a><a href="following.php">フォロワー<span class="badge badge-pill badge-default"><?php echo $following["cnt"]; ?></span></a>
                 </div>
+
                 	<div class="desc" style="text-align:left;border-color:black;border:5px;border-radius: 5px;font-weight: bold;margin-left: 5px;">デジタルハリウッド大学中退<br>職業：校長先生が話す前に子供を静かにさせる<br>やる気、元気、殺意！<br><br>
                 	</div>
                 </div>
@@ -203,65 +214,38 @@
 						<div class="col-xs-12 col-md-7 col-lg-offset-1 col-lg-7" style="margin-top:245px;">
 							<div class="mypage-inner">
 
+                  <?php foreach ($display_list as $post) {
+                   if($post["member_id"] == $profile_member["id"]) { ?>
 
 									<div class="desc" style="background-color: white;">
-									<a href="#"><img class="img-responsive" align="left" src="images/image_1.jpg" alt="mypage" width="200" height="150" style="margin-right: 15px;margin-top: 20px;"></a>
+									<a href="#"><img class="img-responsive" align="left" src="post_picture/<?php echo $post["post_picture"];?>" alt="mypage" style="margin-right: 15px;margin-top: 20px;width: 200px;height: 150px;object-fit: cover;"></a>
 										<br>
-										<h3 align="left" style="font-weight: bold;">投稿１投稿１投稿１投稿１投稿１投稿１投稿１投稿１投稿１投稿１投稿１投稿１投稿１投稿１投稿１投稿１稿１</h3>
-										<p  align="left" style="font-weight: bold;">内容１内容１内容１内...続きを見る</p>
+										<h3 align="left" style="font-weight: bold;"><?php echo $post["word"]; ?></h3>
+										<p  align="left" style="font-weight: bold;"><?php echo $post["explanation"]; ?></p>
 										<br>
-										<p align="right" style="margin-bottom:5px;"><a class="fa fa-leaf" aria-hidden="true" style="color:black"></a><a href="#" align="right" style="color:black;" class="fa fa-star-o" aria-hidden="true"></a></p>
+
+                  <?php if ($post["login_like_flag"] == 0){?>
+                  <a href="like.php?like_post_id=<?php echo $post["id"];?>&page=<?php echo $page;?>"><p align="right" style="margin-bottom:5px;">いいね<a class="fa fa-leaf" aria-hidden="true" style="color:black"></a></a>
+                  <?php }else{?>
+
+                  <a href="like.php?unlike_post_id=<?php echo $post["id"];?>&page=<?php echo $page; ?>"><p align="right" style="margin-bottom:5px;">だめだね<a class="fa fa-leaf" aria-hidden="true" style="color:red"></a></a>
+                  <?php } ?>
+                  <?php if($post["like_count"] > 0){echo $post["like_count"];} 
+
+                    if($post["login_favorite_flag"] == 0){?>
+                  <a href="favorite_function.php?favorite_post_id=<?php echo $post["id"];?>&page=<?php echo $page;?>">お気に入り</a>
+                  <?php }else{?>
+                  <a href="favorite_function.php?unfavorite_post_id=<?php echo $post["id"];?>&page=<?php echo $page; ?>">気に入らない</a>
+                  <?php }
+
+                  if($_SESSION["id"] == $post["member_id"]){ ?>
+                  [<a onclick="return confirm('削除します、よろしいですか？');" href="delete.php?id=<?php echo $post["id"]; ?>" style="color: black;">削除</a>]
+                   <?php }?>  
+                <?php }?> 
+<!-- 										<p align="right" style="margin-bottom:5px;"><a class="fa fa-leaf" aria-hidden="true" style="color:black"></a><a href="#" align="right" style="color:black;" class="fa fa-star-o" aria-hidden="true"></a></p> -->
 									</div>
+                 <?php } ?>
 
-
-									<div class="desc" align="right" style="background-color: white;">
-									<a href="#"><img class="img-responsive" align="left" src="images/image_2.jpg" alt="mypage" width="200" height="200" style="margin-right: 15px;margin-top: 20px;"></a>
-										<br>
-										<h3 align="left" style="font-weight: bold;">投稿2投稿2投稿2投稿2投稿2投稿2</h3>
-										<p  align="left" style="font-weight: bold;">内容2内容2内容2内...続きを見る</p>
-										<br>
-										<p align="right" style="margin-bottom:5px;"><a class="fa fa-leaf" aria-hidden="true" style="color:black"></a><a href="#" align="right" style="color:black;" class="fa fa-star-o" aria-hidden="true"></a></p>
-									</div>
-
-
-									<div class="desc" align="right" style="background-color: white;">
-									<a href="#"><img class="img-responsive" align="left" src="images/image_3.jpg" alt="mypage" width="200" height="200" style="margin-right: 15px;margin-top: 20px;""></a>
-										<br>
-										<h3 align="left" style="font-weight: bold;">投稿3投稿3投稿3投稿3投稿3投稿3</h3>
-										<p  align="left" style="font-weight: bold;">内容3内容3内容3内...続きを見る</p>
-										<br>
-										<p align="right" style="margin-bottom:5px;"><a class="fa fa-leaf" aria-hidden="true" style="color:black"></a><a href="#" align="right" style="color:black;" class="fa fa-star-o" aria-hidden="true"></a></p>
-									</div>
-
-									<div class="desc" align="right" style="background-color: white;">
-									<a href="#"><img class="img-responsive" align="left" src="images/image_4.jpg" alt="mypage" width="200" height="200" style="margin-right: 15px;margin-top: 20px;""></a>
-										<br>
-										<h3 align="left" style="font-weight: bold;">投稿4投稿4投稿4投稿4投稿4投稿4</h3>
-										<p  align="left" style="font-weight: bold;">内容4内容4内容4内...続きを見る</p>
-										<br>
-										<p align="right" style="margin-bottom:5px;"><a class="fa fa-leaf" aria-hidden="true" style="color:black"></a><a href="#" align="right" style="color:black;" class="fa fa-star-o" aria-hidden="true"></a></p>
-									</div>
-	
-
-									<div class="desc" align="right" style="background-color: white;">
-									<a href="#"><img class="img-responsive" align="left" src="images/image_5.jpg" alt="mypage" width="200" height="200" style="margin-right: 15px;margin-top: 20px;""></a>
-										<br>
-										<h3 align="left" style="font-weight: bold;">投稿5投稿5投稿5投稿5投稿5投稿5</h3>
-										<p  align="left" style="font-weight: bold;">内容5内容5内容5内...続きを見る</p>
-										<br>
-										<p align="right" style="margin-bottom:5px;"><a class="fa fa-leaf" aria-hidden="true" style="color:black"></a><a href="#" align="right" style="color:black;" class="fa fa-star-o" aria-hidden="true"></a></p>
-									</div>
-
-
-									<div class="desc" align="right" style="background-color: white;">
-									<a href="#"><img class="img-responsive" align="left" src="images/image_6.jpg" alt="mypage" width="200" height="200" style="margin-right: 15px;margin-top: 20px;""></a>
-										<br>
-										<h3 align="left" style="font-weight: bold;">投稿6投稿6投稿6投稿6投稿6投稿6</h3>
-										<p  align="left" style="font-weight: bold;">内容6内容6内容6内...続きを見る</p>
-										<br>
-										<p align="right" style="margin-bottom:5px;"><a class="fa fa-leaf" aria-hidden="true" style="color:black"></a><a href="#" align="right" style="color:black;" class="fa fa-star-o" aria-hidden="true"></a></p>
-									</div>
-									
 							</div>
 						</div>
 
