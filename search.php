@@ -109,7 +109,7 @@
             <li class="full entry animate-box" data-animate-effect="fadeIn">
               <!-- <a href="images/img_1.jpg"> -->
               <img src="post_picture/<?php echo $tweet["post_picture"]; ?>" >
-                <!-- <div class="entry-img" style="background-image: url(images/img_1.jpg"></div> -->
+                <div class="entry-img" style="background-image: url(images/img_1.jpg"></div>
                 <div class="entry-desc">
                   <h3> <?php echo $tweet["word"]; ?><!--  世界はいつも、決定的瞬間だ。  --></h3> <br>
                   <p> <?php echo $tweet["explanation"]; ?><!-- 写真っていうのはねぇ。いい被写体が来たっ、て思ってからカメラ向けたらもう遅いんですよ。その場の空気に自分が溶け込めば、二、三秒前に来るのがわかるんですよ。その二、三秒のあいだに絞りと、シャッタースピード、距離なんかを合わせておくんです。それで撮るんですよ。 --></p>
