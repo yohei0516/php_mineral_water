@@ -6,6 +6,8 @@
   login_check();
   // DBに接続
   require('dbconnect.php');
+  require('page.php');
+  require('display.php');
 ?>
 <!DOCTYPE HTML>
 <!--
