@@ -29,6 +29,7 @@
      $size_middle = array();
      $size_sm = array();
      $size_small = array();
+     $favorite_list= array();
 
      $type = 'B';
      $empty_big = 0;
@@ -67,10 +68,25 @@
       $login_like_number = $login_like_stmt->fetch(PDO::FETCH_ASSOC);
       $one_post["login_like_flag"] = $login_like_number["like_count"];
 
-     
 
-     
 
+      // like数を求めるSQL文
+      $favorite_sql = "SELECT COUNT(*)as `favorite_count` FROM `kotobato_favorites` WHERE `post_id`=".$one_post["id"];
+      // SQL文実行
+      $favorite_stmt = $dbh->prepare($favorite_sql);
+      $favorite_stmt->execute();
+      $favorite_number = $favorite_stmt->fetch(PDO::FETCH_ASSOC);
+      //1行分のデータに新しいキーを用意して、like数を代入
+      $favorite_post["favorite_count"] = $favorite_number["favorite_count"];
+      // ログインしている人がLikeしているかどうかの情報を取得
+      $login_favorite_sql = "SELECT COUNT(*) as `favorite_count` FROM `kotobato_favorites` WHERE `post_id`=".$one_post['id']." AND `member_id` =".$_SESSION["id"];
+      // SQL文実行
+      $login_favorite_stmt = $dbh->prepare($login_favorite_sql);
+      $login_favorite_stmt->execute();
+
+      // フェッチして取得
+      $login_favorite_number = $login_favorite_stmt->fetch(PDO::FETCH_ASSOC);
+      $one_post["login_favorite_flag"] = $login_favorite_number["favorite_count"];
 
 
         if($one_post["like_count"] >= 10){
@@ -101,6 +117,7 @@
         $n++;
         }
       }
+
     }
   }catch(Exception $e){
     exit();
@@ -108,10 +125,11 @@
 
 
   try{
-            // echo "<pre>";
-            // var_dump($post_big);
+            //       echo "<pre>";
+            // var_dump($display_list);
             // echo "</pre>";
             // exit;
+
         while (1) {
           if($empty_big == 1 && $empty_middle == 1 && $empty_small == 1){
             break;
@@ -190,8 +208,9 @@
           }
 
         }
+
             // echo "<pre>";
-            // var_dump($$display_list);
+            // var_dump($display_list);
             // echo "</pre>";
             // exit;
 
@@ -228,6 +247,55 @@
 
  ?>
 
+<?php
+  try{ 
+    $sql_fo = "SELECT * FROM `kotobato_follows` WHERE `member_id`=".$_SESSION["id"];
+    $stmt_fo = $dbh->prepare($sql_fo);
+    $stmt_fo->execute();
+
+    $follows = array();
+
+    while (1) {
+    $follow_one = $stmt_fo->fetch(PDO::FETCH_ASSOC);
+      if($follow_one == false){
+        break;
+      }else{
+
+        $follows = $follow_one;
+      }
+    }
+  }catch(Exception $e){
+    echo 'SQL実行エラー:'.$e->getMessage();
+    exit();
+  }
+
+
+
+    //         echo "<pre>";
+    //         var_dump($follows);
+    //         echo "</pre>";
+    //         exit;
+
+    // foreach ($display_list as $one) {
+    //   foreach ($follows as $f) {
+    //     if (isset($one) AND isset($f)) {
+
+    //       if ($one["member_id"] == $f["follower_id"]){
+    //          if (!isset($f["follower_id"])) {
+    //             continue;
+    //           }
+    //         $one["post"] = $f;
+    //       }
+    //     }
+    //   }
+    // }
+
+    //         echo "<pre>";
+    //         var_dump($one["post"]);
+    //         echo "</pre>";
+    //         exit;
+
+ ?>
 
 
 <?php 
