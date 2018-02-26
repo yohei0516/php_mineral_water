@@ -261,7 +261,7 @@
         break;
       }else{
 
-        $follows = $follow_one;
+        $follows[] = $follow_one;
       }
     }
   }catch(Exception $e){
@@ -271,29 +271,27 @@
 
 
 
-    //         echo "<pre>";
-    //         var_dump($follows);
-    //         echo "</pre>";
-    //         exit;
+            // echo "<pre>";
+            // var_dump($_SESSION);
+            // echo "</pre>";
+            // exit;
+    $display = array();
+    foreach ($display_list as $one) {
+      foreach ($follows as $f) {
 
-    // foreach ($display_list as $one) {
-    //   foreach ($follows as $f) {
-    //     if (isset($one) AND isset($f)) {
 
-    //       if ($one["member_id"] == $f["follower_id"]){
-    //          if (!isset($f["follower_id"])) {
-    //             continue;
-    //           }
-    //         $one["post"] = $f;
-    //       }
-    //     }
-    //   }
-    // }
+          if ($one["member_id"] == $f["follower_id"]){
+             
+             $display[]=$one;
+          }
+        
+      }
+    }
 
-    //         echo "<pre>";
-    //         var_dump($one["post"]);
-    //         echo "</pre>";
-    //         exit;
+            // echo "<pre>";
+            // var_dump($display);
+            // echo "</pre>";
+            // exit;
 
  ?>
 
