@@ -2,8 +2,17 @@
   session_start();
   // DBの接続
   require('dbconnect.php');
+
+  $sql = "SELECT * FROM `kotobato_members` WHERE `id`=".$_GET["member_id"];
+
+  $stmt = $dbh->prepare($sql);
+  $stmt->execute();
+
+  $profile_member = $stmt->fetch(PDO::FETCH_ASSOC);
+
+
   // ログインしている人のプロフィール情報をmembersテーブルから取得
-  $sql = "SELECT * FROM `kotobato_members` WHERE `id`=".$_SESSION["id"];
+  $sql = "SELECT * FROM `kotobato_members` WHERE `id`=".$_GET["member_id"];
   $stmt = $dbh->prepare($sql);
   $stmt->execute();
   $profile_member = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -160,12 +169,14 @@
                 </div>
                <div style="background-color: #fff;border-bottom-right-radius: 10px;border-bottom-left-radius: 10px;border-bottom: solid 2px #3B5998;border-right: solid 2px #3B5998;border-left: solid 2px #3B5998;">
                 <div class="avatar" style="text-align: center;">
-                    <img alt="" src="images/image_7.jpg" >
+                    <img alt="" src="picture_path/<?php echo $profile_member["picture_path"];?>" style="object-fit: cover;">
                 </div>
                 <div class="info">
                     <div class="title" style="text-align: center;">
-                        <h3 target="_blank" href="#" style="color:black;font-family: arial, sans-serif;font-weight: bold;">レベッカ</h>
-                        <a href="#" style="font-size:15px;color:black;font-family: arial, sans-serif;"><br>プロフィールを編集</a>
+                        <h3 target="_blank" href="#" style="color:black;font-family: arial, sans-serif;font-weight: bold;"><?php echo $profile_member["nick_name"]; ?></h>
+                        <?php if($_SESSION["id"] == $profile_member["id"]){ ?>
+                        <a href="edit.php?member_id=<?php echo $profile_member["id"];?>" style="font-size:15px;color:black;font-family: arial, sans-serif;"><br>プロフィールを編集</a>
+                         <?php }?>
                     </div>
 
 <!-- 						      <?php foreach ($post_list as $one_post) { ?>
@@ -184,13 +195,14 @@
 
                  </div> 
                 <div class="bottom" style="text-align: center;">
-                    <a class="posts" href="#" value="投稿" style="color:#7f7f7f;font-weight: bold;">投稿</a>
-                    <a class="favoritte" href="#" value="お気に入り" style="color:#7f7f7f;font-weight: bold;">お気に入り</a>
-                    <a class="follows"　href="#" value="フォロー" style="color:#7f7f7f;font-weight: bold;">フォロー</a>
-                    <a class="following"　href="#" value="フォロワー" style="color:#7f7f7f;font-weight: bold;">フォロワー</a>
+                    <a class="posts" href="profile.php?member_id=<?php echo $profile_member["id"];?>" style="color:#7f7f7f;font-weight: bold;">投稿</a>
+                    <a class="favorite" href="favorite.php?member_id=<?php echo $profile_member["id"];?>" style="color:#7f7f7f;font-weight: bold;">お気に入り</a>
+
+          <a href="follows.php?member_id=<?php echo $profile_member["id"];?>">フォロー</a>
+          <a href="following.php?member_id=<?php echo $profile_member["id"];?>">フォロワー</a>
                 </div>
                 	<div class="desc" style="text-align:left;font-weight: bold;margin-left: 5px;">
-                		デジタルハリウッド大学中退<br>職業：校長先生が話す前に子供を静かにさせる<br>やる気、元気、殺意！<br><br>
+                		<?php echo $profile_member["profile"]; ?><br><br>
                  	</div>
                 </div>
             </div>
