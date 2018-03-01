@@ -67,12 +67,17 @@
     $pdo = new PDO($dsn, $user, $password);
 
     // :idは、プレースホルダ
-    $sql = "SELECT * FROM `kotobato_posts` WHERE word = :id";
+    $sql = "SELECT * FROM `kotobato_posts` WHERE word LIKE '%".$id."%'";
 
+    // echo "<pre>";
+    // var_dump($sql);
+    // echo "</pre>";
+
+    $date = array($id);
     // プリペアドステートメントを作成
     $stmt = $pdo->prepare($sql);
     // プレースホルダと変数をバインド
-    $stmt -> bindParam(":id",$id);
+    // $stmt -> bindParam(":id",$id);
     $stmt -> execute(); //実行
 
     $search_list = array();
@@ -84,10 +89,12 @@
         $search_list[] = $rec;
     }
       // テーブルの項目名を指定して値を表示
-      // echo $rec['id'];
-      // echo $rec['word'];
-      // echo $rec['explanation'];
+      // echo $search_list['id'];
+      // echo $search_list['word'];
+      // echo $search_list['explanation'];
       // echo '<br>';
+
+
     // }
 
   }catch (PDOException $e) {
@@ -108,8 +115,8 @@
           <ul id="gtco-post-list">
             <li class="full entry animate-box" data-animate-effect="fadeIn">
               <!-- <a href="images/img_1.jpg"> -->
-              <img src="post_picture/<?php echo $tweet["post_picture"]; ?>" >
-                <div class="entry-img" style="background-image: url(images/img_1.jpg"></div>
+              <img src="post_picture/<?php echo $tweet["post_picture"]; ?>">
+                <!-- <div class="entry-img" style="background-image: url(images/img_1.jpg"></div> -->
                 <div class="entry-desc">
                   <h3> <?php echo $tweet["word"]; ?><!--  世界はいつも、決定的瞬間だ。  --></h3> <br>
                   <p> <?php echo $tweet["explanation"]; ?><!-- 写真っていうのはねぇ。いい被写体が来たっ、て思ってからカメラ向けたらもう遅いんですよ。その場の空気に自分が溶け込めば、二、三秒前に来るのがわかるんですよ。その二、三秒のあいだに絞りと、シャッタースピード、距離なんかを合わせておくんです。それで撮るんですよ。 --></p>
