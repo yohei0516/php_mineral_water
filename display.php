@@ -12,7 +12,7 @@
      // テーブル結合
      // ORDER BY 最新順位並び替え
      // 論理削除に対応、delete_flag = 0のものだけ取得
-     $sql = "SELECT `kotobato_posts`.*,`kotobato_members`.`nick_name` FROM `kotobato_posts` INNER JOIN `kotobato_members` ON `kotobato_posts`.`member_id`=`kotobato_members`.`id` WHERE `delete_flag`=0 ORDER BY `kotobato_posts`.`modified` DESC";
+     $sql = "SELECT `kotobato_posts`.*,`kotobato_members`.`nick_name`,`kotobato_members`.`picture_path` FROM `kotobato_posts` INNER JOIN `kotobato_members` ON `kotobato_posts`.`member_id`=`kotobato_members`.`id` WHERE `delete_flag`=0 ORDER BY `kotobato_posts`.`modified` DESC";
 
      $stmt = $dbh->prepare($sql);
      $stmt->execute();
@@ -89,13 +89,13 @@
       $one_post["login_favorite_flag"] = $login_favorite_number["favorite_count"];
 
 
-        if($one_post["like_count"] >= 10){
+        if($one_post["like_count"] >= 3){
           $row_big["row"] = $b*3 - 2;
           $size_big["size"] = "B";
           $post_big[] = array_merge($row_big,$one_post,$size_big);
           $b++;         
 
-        }elseif (10 > $one_post["like_count"] && $one_post["like_count"] > 1) {
+        }elseif (3 > $one_post["like_count"] && $one_post["like_count"] > 1) {
           $row_middle["row"] = $m*3 - 1;
           $size_middle["size"] = "M";
           $post_middle[] = array_merge($row_middle,$one_post,$size_middle);
@@ -275,18 +275,21 @@
             // var_dump($_SESSION);
             // echo "</pre>";
             // exit;
-    $display = array();
-    foreach ($display_list as $one) {
-      foreach ($follows as $f) {
+
+    // $display = array();
+    // $display_my = array();
 
 
-          if ($one["member_id"] == $f["follower_id"]){
+
+    // foreach ($display_list as $my) {
+
+    //       if ($one["member_id"] == $_SESSION["id"]){
              
-             $display[]=$one;
-          }
-        
-      }
-    }
+    //          $display_my[] = $my;
+    //       }        
+      
+    // }
+    // sort($display);
 
             // echo "<pre>";
             // var_dump($display);
