@@ -86,7 +86,7 @@
 
 
           <?php for ($i=1; $i <=12 ; $i++) { 
-            foreach($display_list as $post){
+            foreach($display as $post){
              if($post["row"] == $i){
               if ($post["size"] == "B") {?>
                               

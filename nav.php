@@ -15,8 +15,8 @@
 						<li><a id="modal-open" class="buttons button button-link">投稿</a></li>
 						<li><a href="#">ジャンル</a></li>
 						<!-- <li><a href="profile.html">検索</a></li> -->
-						<li><a href="profile.html">プロフィール</a></li>
-						<li><a href="index.html">ログアウト</a></li>
+						<li><a href="profile.php?member_id=<?php echo $login_member["id"];?>">プロフィール</a></li>
+						<li><a href="logout.php">ログアウト</a></li>
 					</ul>
 				</div>
 			</div>
