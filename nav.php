@@ -3,7 +3,7 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-xs-2 text-left">
-					<div id="gtco-logo"><a href="main.html">コトバと<span>.</span></a></div>
+					<div id="gtco-logo"><a href="main.php">コトバと<span>.</span></a></div>
 				</div>
 				<div class="col-xs-10 text-right menu-1 yubi">
 						<!-- 検索窓 -->
@@ -13,10 +13,10 @@
 					</form> 
 					<ul>
 						<li><a id="modal-open" class="buttons button button-link">投稿</a></li>
-						<li><a href="#">ジャンル</a></li>
+<!-- 						<li><a href="#">ジャンル</a></li> -->
 						<!-- <li><a href="profile.html">検索</a></li> -->
-						<li><a href="profile.html">プロフィール</a></li>
-						<li><a href="index.html">ログアウト</a></li>
+						<li><a href="profile.php?member_id=<?php echo $login_member["id"];?>">プロフィール</a></li>
+						<li><a href="logout.php">ログアウト</a></li>
 					</ul>
 				</div>
 			</div>

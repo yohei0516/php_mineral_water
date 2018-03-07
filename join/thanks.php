@@ -12,9 +12,6 @@
 <body>
     <div class="form-wrapper">
       <h1>Thank You！</h1>
-<!--    <div class="container">
-          <div class="row">
-            <div class="col-md-4 col-md-offset-4 content-margin-top"> -->
               <div class="thanks_text"> 
                 気になるあの人をフォローしたり、<br>
                 あなたの「コトバ」を共有しましょう。
@@ -24,36 +21,7 @@
                   <input class="button" href="..login.php" value="コトバとをはじめる"></input>
                 </div>
               </a>
-<!--        </div>
-          </div>
-        </div> -->
-<!--       <form method="post" action="" >
-
-        <div class="form-item">
-          <label for="nick_name"></label>
-          <input type="nick_name" name="nick_name" required="required" value="なおき"></input>
-        </div>
-
-        <div class="form-item">
-          <label for="email"></label>
-          <input type="email" name="email" required="required" value="naoki@gmail.com"></input>
-        </div>
-
-        <div class="form-item">
-          <label for="password"></label>
-          <input type="password" name="password" required="required" value="●●●●●●●●"></input>
-        </div>
-
-        <div class="button-panel">
-          <input type="submit" class="button" value="ログイン"></input>
-        </div>
-
-          <a href="../index.html" class="btn btn-default">ログイン</a>
-      </form> -->
-
-
-      <div class="form-footer">
-<!--         <p><a href="join.html">入力内容を修正する</a></p> -->
+       <div class="form-footer">
       </div>
     </div>  
 </body>

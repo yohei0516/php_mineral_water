@@ -3,15 +3,12 @@
   //DBに接続
   require('../dbconnect.php');
 
-
   //会員ボタンが押された時
   if (isset($_POST) && !empty($_POST)){
   //変数に入力された値を代入して扱いやすいようにする。
     $nick_name = $_SESSION['join']['nick_name'];
     $email = $_SESSION['join']['email'];
     $password = $_SESSION['join']['password'];
-
-
 
     try{
     //DBに会員情報を登録するSQL文を作成
@@ -23,8 +20,7 @@
       $stmt = $dbh->prepare($sql);
       $stmt->execute($data);
 
-      var_dump($nick_name);
-
+      // var_dump($nick_name);
 
     //$_SESSIONの情報を削除
     // unset　指定した変数を削除するという意味。SESSIONじゃなくても使える。
@@ -77,8 +73,6 @@
         <div class="button-panel">
           <input type="submit" class="button" value="完了する"></input>
         </div>
-
-
       </form>
       <div class="form-footer">
         <p><a href="join.php?action=rewrite">入力内容を修正する</a></p>

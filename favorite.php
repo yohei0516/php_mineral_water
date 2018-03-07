@@ -32,9 +32,12 @@
   // $stmt_fv->execute();
 
 
-  $sql_ps = "SELECT `kotobato_posts`.*,`kotobato_favorites`.`member_id`,`kotobato_favorites`.`post_id` FROM `kotobato_posts` INNER JOIN `kotobato_favorites` ON `kotobato_posts`.`id`=`kotobato_favorites`.`post_id` WHERE `delete_flag`=0 AND `kotobato_favorites`.`member_id` =".$_GET["member_id"]." ORDER BY `kotobato_posts`.`modified` DESC ";
+  // $sql_ps = "SELECT `kotobato_posts`.*,`kotobato_favorites`.`member_id`,`kotobato_favorites`.`post_id` FROM `kotobato_posts` INNER JOIN `kotobato_favorites` ON `kotobato_posts`.`id`=`kotobato_favorites`.`post_id` WHERE `delete_flag`=0 AND `kotobato_favorites`.`member_id` =".$_GET["member_id"]." ORDER BY `kotobato_posts`.`modified` DESC ";
 
   // "ORDER BY `kotobato_posts`.`modified` DESC"
+
+ $sql_ps = "SELECT `kotobato_posts`.*,`kotobato_members`.`nick_name`,`kotobato_members`.`picture_path` FROM `kotobato_posts` INNER JOIN `kotobato_members` ON `kotobato_posts`.`member_id`=`kotobato_members`.`id` WHERE `delete_flag`=0  ORDER BY `kotobato_posts`.`modified` DESC ";
+
 
      $stmt_ps = $dbh->prepare($sql_ps);
      $stmt_ps->execute();
@@ -98,13 +101,13 @@
       $one_post["login_favorite_flag"] = $login_favorite_number["favorite_count"];
 
 
-	    	$sql_fv = "SELECT * FROM `kotobato_members` WHERE `id`=".$one_post["member_id"];
-	    	$stmt_fv = $dbh->prepare($sql_fv);
-  			$stmt_fv->execute();
-  			$member = $stmt_fv->fetch(PDO::FETCH_ASSOC);
+	    // 	$sql_fv = "SELECT * FROM `kotobato_members` WHERE `id`=".$_GET['member_id'];
+	    // 	$stmt_fv = $dbh->prepare($sql_fv);
+  			// $stmt_fv->execute();
+  			// $member = $stmt_fv->fetch(PDO::FETCH_ASSOC);
 
 
-  			$one_post["nick_name"] = $member["nick_name"];
+  			// $one_post["nick_name"] = $member["nick_name"];
 
 	    	$post_list[] = $one_post;
 
@@ -125,13 +128,19 @@
   // }
 
             // echo "<pre>";
-            // var_dump($display_list);
+            // var_dump($post_list);
             // echo "</pre>";
             // exit;
 // $display_list[] = array_values($one_list);
 
+// foreach($post_list as $f){
+//   if($f == )
+
+// }
+
+
             // echo "<pre>";
-            // var_dump($_GET);
+            // var_dump($post_list);
             // echo "</pre>";
             // exit;
 
@@ -174,24 +183,24 @@
 	<![endif]-->
 
 
-<style>
 
+ <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
 
-</style>
 	</head>
 	<body>
 		
 	<div class="gtco-loader"></div>
 	
 	<div id="page">
-	<nav class="gtco-nav" role="navigation">
+  <?php include('nav.php');?>
+<!-- 	<nav class="gtco-nav" role="navigation">
 		<div class="container">
 			<div class="row">
 				<div class="col-xs-8 text-left">
 					<div id="gtco-logo"><a href="main.html">コトバと<span>.</span></a></div>
 				</div>
 				<div class="col-xs-10 text-right menu-1">
-					<ul>
+					<ul> -->
 						<!-- プルダウンできるコード -->
 						<!--<li class="has-dropdown">
 							<a href="category.html">投稿</a>
@@ -202,7 +211,7 @@
 								<li><a href="#">Django</a></li>
 							</ul>
 						</li> -->
-						<li><a href="#">投稿</a></li>
+<!-- 						<li><a href="#">投稿</a></li>
 						<li><a href="#">ジャンル</a></li>
 						<li><a href="#">検索</a></li>
 						<li><a href="#">プロフィール</a></li>
@@ -212,7 +221,7 @@
 			</div>
 			
 		</div>
-	</nav>
+	</nav> -->
 	
 <div id="fh5co-blog-section">
 		<div class="container">
@@ -226,15 +235,24 @@
 	<div class="row">
 		<div class="col-xs-offset-2 col-xs-8 col-xs-offset-2 col-md-5 col-lg-4" style="margin-left: 0;">
 
-            <div class="card hovercard" style="float:none;margin-top:150px;">
+            <div class="card hovercard" style="float:none;margin-top:95px;">
                 <div class="cardheader">
 
                 </div>
                <div class="background" style="background-color: #fff;">
-                <div class="avatar" style="text-align: center;">
-                    <img alt="" src="picture_path/<?php echo $profile_member["picture_path"];?>" style="object-fit: cover;">
+
+                <?php if(!empty($profile_member["picture_path"])){  ?>
+                <div class="avatar" style="text-align: center;" style="border-top-left-radius: 10px;border-top-right-radius: 10px;">
+                    <img src="picture_path/<?php echo $profile_member["picture_path"];?>" style="object-fit: cover;">
                 </div>
+                <?php }else{ ?>
+                <div class="avatar" style="text-align: center;" style="border-top-left-radius: 10px;border-top-right-radius: 10px;">
+                    <img src="picture_path/person-976759_1280.jpg?>" style="object-fit: cover;">
+                </div>
+                <?php } ?>
+
                 <div class="info">
+                  <br><br>
                     <div class="title" style="text-align: center;">
                         <h3 target="_blank" href="#" style="color:black;font-family: arial, sans-serif;font-weight: bold;"><?php echo $profile_member["nick_name"]; ?></h>
                         <?php if($_SESSION["id"] == $profile_member["id"]){ ?>
@@ -243,70 +261,78 @@
                     </div>
 
                 </div>
-                <div class="bottom" style="text-align: center;">
-                    <a class="posts" href="profile.php?member_id=<?php echo $profile_member["id"];?>" style="color:#7f7f7f;font-weight: bold;">投稿</a>
-                    <a class="favorite" href="favorite.php?member_id=<?php echo $profile_member["id"];?>" style="color:#7f7f7f;font-weight: bold;">お気に入り</a>
 
-          <a href="follows.php?member_id=<?php echo $profile_member["id"];?>">フォロー</a><a href="following.php?member_id=<?php echo $profile_member["id"];?>">フォロワー</a>
+
+                <div class="bottom" style="text-align: center;font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;">
+                    <a class="posts" href="profile.php?member_id=<?php echo $profile_member["id"];?>" style="color:#7f7f7f;font-weight: bold;font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;font-size: 16px;">投稿</a>
+                    <a class="favorite" href="favorite.php?member_id=<?php echo $profile_member["id"];?>" style="color:#7f7f7f;font-weight: bold;font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;font-size: 16px;">お気に入り</a>
+
+                    <a href="follows.php?member_id=<?php echo $profile_member["id"];?>" style="color:#7f7f7f;font-weight: bold;font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;font-size: 16px;">フォロー</a>
+                    <a href="following.php?member_id=<?php echo $profile_member["id"];?>" style="color:#7f7f7f;font-weight: bold;font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;font-size: 16px;">フォロワー</a>
                 </div>
-                	<div class="desc" style="text-align:left;border-color:black;border:5px;border-radius: 5px;background-color: #fff;font-weight: bold;">デジタルハリウッド大学中退<br>職業：校長先生が話す前に子供を静かにさせる<br>やる気、元気、殺意！<br><br><br><br></div>
+
+
+                	<div class="desc" style="text-align:left;border-color:black;border:5px;border-radius: 5px;background-color: #fff;font-weight: bold;font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;font-size: 15px;"><?php echo $profile_member["profile"]; ?><br><br></div>
                 </div>
             </div>
         </div>
 
-						<div class="col-xs-12 col-md-7 col-lg-offset-1 col-lg-7" style="margin-top:245px;">
-							<div class="mypage-inner">
+      <div class="mypage-inner col-xs-12 col-md-7 col-lg-8">
+                <?php foreach ($post_list as $post) {  ?>
+						<div style="margin-top:190px;text-align: right;">
+							<div class="mypage-inner col-md-12 col-lg-12" style="background-color: white;margin-top: 5px;">
 
-
-								<?php foreach ($post_list as $post) {  ?>
-
-									<div class="desc" style="background-color: white;">
-									<a href="#"><img class="img-responsive" align="left" src="post_picture/<?php echo $post["post_picture"];?>" alt="mypage" style="margin-right: 15px;margin-top: 20px;object-fit: cover;width: 200px;height: 150px;"></a>
+									<div class="des">
+									<a href="#"><img class="img" align="left" src="post_picture/<?php echo $post["post_picture"];?>" alt="mypage" style="margin-right: 15px;margin-top: 20px;object-fit: cover;width: 200px;height: 150px;"></a>
 										<br>
 										<h3 align="left" style="font-weight: bold;"><?php echo $post["word"]; ?></h3>
 										<p  align="left" style="font-weight: bold;"><?php echo $post["explanation"]; ?></p>
 										<br>
-										<p align="right" style="margin-bottom:5px;"><a class="fa fa-leaf" aria-hidden="true" style="color:black"></a><a href="#" align="right" style="color:black;" class="fa fa-star-o" aria-hidden="true"></a></p>
-									</div>
 
-									  <div class="col-lg-12 col-md-12 col-xs-12">
-      							<a href="profile.php?member_id=<?php echo $post["member_id"];?>"><br>
-      		          <?php echo $post["nick_name"]; ?>
-      		          </a>
-
+                      <div style="float: right;">
       							<?php if ($post["login_like_flag"] == 0){?>
-      							<a href="like.php?like_post_id=<?php echo $post["member_id"];?>&page=<?php echo $page; ?>" class="post-meta">いいね</a>
+      							<a href="like.php?like_post_id=<?php echo $post["id"];?>&page=<?php echo $page; ?>" class="post-meta"><i class="far fa-thumbs-up " aria-hidden="true" style="color: #7f7f7f;font-size: 25px;" ></i></a>
       							<?php }else{?>
 
-      							<a href="like.php?unlike_post_id=<?php echo $post["member_id"];?>&page=<?php echo $page; ?>">だめだね</a>
+      							<a href="like.php?unlike_post_id=<?php echo $post["id"];?>&page=<?php echo $page; ?>"><i class="far fa-thumbs-up " aria-hidden="true" style="color:#DC143C;font-size: 25px;"></i></a>
                     <?php } ?>
                     <?php if($post["like_count"] > 0){echo $post["like_count"];} ?>
       							
-                    <?php if($post["login_favorite_flag"] == 0){?>
-                    <a href="favorite_function.php?favorite_post_id=<?php echo $post["id"];?>&page=<?php echo $page;?>">お気に入り</a>
-                    <?php }else{?>
-                    <a href="favorite_function.php?unfavorite_post_id=<?php echo $post["id"];?>&page=<?php echo $page; ?>">気に入らない</a>
-                    <?php } ;
+                   <?php if($post["login_favorite_flag"] == 0){?>
+                  <a href="favorite_function.php?favorite_post_id=<?php echo $post["id"];?>&page=<?php echo $page;?>"><i class="fas fa-heart" aria-hidden="true" style="color: #7f7f7f;font-size: 25px;"></i></a>
+                  <?php }else{?>
+                  <a href="favorite_function.php?unfavorite_post_id=<?php echo $post["id"];?>&page=<?php echo $page; ?>"><i class="fas fa-heart" aria-hidden="true" style="color:#DC143C;font-size: 25px;"></i></a>
+                  <?php } ?>
 
-                     if($_SESSION["id"] == $post["member_id"]){ ?>
-                     [<a onclick="return confirm('削除します、よろしいですか？');" href="delete.php?id=<?php echo $post["id"]; ?>" style="color: black;">削除</a>]
-                     <?php }?>
-                     </div>
+                    <a href="profile.php?member_id=<?php echo $post["member_id"];?>" style="color: #7f7f7f;font-size: 17px;">
+                    <?php echo $post["nick_name"]; ?>
+                    </a>
 
-   							<?php 
-   					} ?>
-									
-							</div>
-						</div>
+                    <?php if(!empty($post["picture_path"])){ ?>
+                   <img class="img" src="picture_path/<?php echo $post["picture_path"];?>" style="height:50px;width:50px;color:#7f7f7f;border-radius:50%;object-fit: cover;margin-bottom:25px">
+                      <?php }else{ ?>
 
-				</div>
+                    <img class="img" src="picture_path/person-976759_1280.jpg?>" style="height:50px;width:50px;color:#7f7f7f;border-radius:50%;object-fit: cover;margin-bottom:25px">
+                      <?php } ?>
 
+                      &nbsp;
+                     <?php if($_SESSION["id"] == $post["member_id"]){ ?>
+                     <a onclick="return confirm('削除します、よろしいですか？');" href="delete.php?id=<?php echo $post["id"]; ?>" style="color: black;"><i class="far fa-trash-alt" style="font-size: 25px;"></i></a>
+                     <?php }?> 
+                  </div>
+
+                </div>									
+							</div>             
+            <?php } ?>
+				  </div>
+
+        </div>
 			</div>
 		</div>
 	</div>
 	
 	<footer id="gtco-footer" role="contentinfo">
-		<div class="container">
+		<div class="container col-xs-12 col-md-12 col-lg-12">
 			<div class="row copyright">
 				<div class="col-md-12 text-center">
 					<p>

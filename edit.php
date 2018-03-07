@@ -13,6 +13,11 @@ $stmt->execute();
 
 $profile_member = $stmt->fetch(PDO::FETCH_ASSOC);
 
+            //           echo "<pre>";
+            // var_dump($_POST);
+            // echo "</pre>";
+            // exit;
+
 
  if (isset($_POST) && !empty($_POST)){
 
@@ -36,31 +41,31 @@ $profile_member = $stmt->fetch(PDO::FETCH_ASSOC);
     $member_id = $_SESSION['id'];
 
             //           echo "<pre>";
-            // var_dump($_FILES);
+            // var_dump($_POST);
             // echo "</pre>";
             // exit;
 if(!isset($error)){
-      try{
-        //検索条件にヒットした件数を取得するSQL文
-        $sql = "SELECT COUNT(*) as `cnt` FROM `kotobato_members` WHERE `email` =?";
+      // try{
+      //   //検索条件にヒットした件数を取得するSQL文
+      //   $sql = "SELECT COUNT(*) as `cnt` FROM `kotobato_members` WHERE `email` =?";
 
-        //sql文実行;
-        $data = array($_POST["email"]);
-        $stmt = $dbh->prepare($sql);
-        $stmt->execute($data);
+      //   //sql文実行;
+      //   $data = array($_POST["email"]);
+      //   $stmt = $dbh->prepare($sql);
+      //   $stmt->execute($data);
 
-        //件数取得
-        $count = $stmt->fetch(PDO::FETCH_ASSOC);
+      //   //件数取得
+      //   $count = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if($count['cnt'] > 0){
-          //重複エラー
-          $error['email'] = "duplicated";
+      //   if($count['cnt'] > 0){
+      //     //重複エラー
+      //     $error['email'] = "duplicated";
 
-      }
+      // }
 
-      }catch(Exception $e){
-        exit;
-      }
+      // }catch(Exception $e){
+      //   exit;
+      // }
       
       $ext = substr($_FILES['picture_path']['name'],-3);
       if(($ext == 'png') || ($ext == 'jpg') || ($ext == 'gif')){
@@ -82,14 +87,27 @@ if(!isset($error)){
       }
 
         // 特にアクションがなくても保持して
-        $post_id = $_GET['id'];
+        // $post_id = $_GET['id'];
 
          $sql = "UPDATE `kotobato_members` SET `nick_name`=?,`email`=?,`password`=?,`picture_path`=?,`profile`=? WHERE `id`=".$_SESSION["id"];
 
           $data = array($nick_name,$email,sha1($password),$picture_path,$profile);
              // var_dump($_POST); 
           $stmt = $dbh->prepare($sql);
-          $members = $stmt->execute($data);       
+          $members = $stmt->execute($data);
+
+          $sql_id = "SELECT * FROM `kotobato_members` WHERE `email`=? AND `password`=?";
+          $data_id = array($email,sha1($password));
+             // var_dump($_POST); 
+          $stmt_id = $dbh->prepare($sql_id);
+          $stmt_id->execute($data_id);
+
+          $members = $stmt_id->fetch(PDO::FETCH_ASSOC);
+
+          // var_dump($members); 
+          // exit;
+
+
       }
 
 
@@ -164,14 +182,17 @@ if(!isset($error)){
 	<div class="gtco-loader"></div>
 	
 	<div id="page">
-	<nav class="gtco-nav" role="navigation">
+
+    <!-- ナビバー呼び出し -->
+  <?php include('nav.php');?>
+<!-- 	<nav class="gtco-nav" role="navigation">
 		<div class="container">
 			<div class="row">
 				<div class="col-xs-8 text-left">
 					<div id="gtco-logo"><a href="main.html">コトバと<span>.</span></a></div>
 				</div>
 				<div class="col-xs-10 text-right menu-1">
-					<ul>
+					<ul> -->
 						<!-- プルダウンできるコード -->
 						<!--<li class="has-dropdown">
 							<a href="category.html">投稿</a>
@@ -182,7 +203,7 @@ if(!isset($error)){
 								<li><a href="#">Django</a></li>
 							</ul>
 						</li> -->
-						<li><a href="#">投稿</a></li>
+<!-- 						<li><a href="#">投稿</a></li>
 						<li><a href="#">ジャンル</a></li>
 						<li><a href="#">検索</a></li>
 						<li><a href="#">プロフィール</a></li>
@@ -192,7 +213,7 @@ if(!isset($error)){
 			</div>
 			
 		</div>
-	</nav>
+	</nav> -->
 	
 <div id="fh5co-blog-section">
 		<div class="container">
@@ -211,9 +232,17 @@ if(!isset($error)){
 
                 </div>
                <div class="background" style="background-color: #fff;border-bottom-right-radius: 10px;border-bottom-left-radius: 10px;border-bottom: solid 2px #3B5998;border-right: solid 2px #3B5998;border-left: solid 2px #3B5998;">
-                <div class="avatar" style="text-align: center;">
-                    <img alt="" src="picture_path/<?php echo $profile_member["picture_path"];?>" style="object-fit: cover;">
+
+                <?php if(!empty($profile_member["picture_path"])){  ?>
+                <div class="avatar" style="text-align: center;" style="border-top-left-radius: 10px;border-top-right-radius: 10px;">
+                    <img src="picture_path/<?php echo $profile_member["picture_path"];?>" style="object-fit: cover;">
                 </div>
+                <?php }else{ ?>
+                <div class="avatar" style="text-align: center;" style="border-top-left-radius: 10px;border-top-right-radius: 10px;">
+                    <img src="picture_path/person-976759_1280.jpg?>" style="object-fit: cover;">
+                </div>
+                <?php } ?>
+                
                 <div class="info">
                     <div class="title" style="text-align: center;">
                         <h3 target="_blank" href="#" style="color:black;font-family: arial, sans-serif;font-weight: bold;"><?php echo $profile_member["nick_name"]; ?></h>
@@ -221,13 +250,19 @@ if(!isset($error)){
                     </div>
 
                 </div>
-                <div class="bottom" style="text-align: center;">
-                    <a class="posts" href="profile.php?member_id=<?php echo $profile_member["id"];?>" style="color:#7f7f7f;font-weight: bold;">投稿</a>
-                    <a class="favorite" href="favorite.php?member_id=<?php echo $profile_member["id"];?>" style="color:#7f7f7f;font-weight: bold;">お気に入り</a>
 
-          <a href="follows.php?member_id=<?php echo $profile_member["id"];?>">フォロー</a><a href="following.php?member_id=<?php echo $profile_member["id"];?>">フォロワー</a>
+
+                <div class="bottom" style="text-align: center;font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;">
+                    <a class="posts" href="profile.php?member_id=<?php echo $profile_member["id"];?>" style="color:#7f7f7f;font-weight: bold;font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;font-size: 16px;">投稿</a>
+                    <a class="favorite" href="favorite.php?member_id=<?php echo $profile_member["id"];?>" style="color:#7f7f7f;font-weight: bold;font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;font-size: 16px;">お気に入り</a>
+
+                    <a href="follows.php?member_id=<?php echo $profile_member["id"];?>" style="color:#7f7f7f;font-weight: bold;font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;font-size: 16px;">フォロー</a>
+                    <a href="following.php?member_id=<?php echo $profile_member["id"];?>" style="color:#7f7f7f;font-weight: bold;font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;font-size: 16px;">フォロワー</a>
                 </div>
-                	<div class="desc" style="text-align:left;font-weight: bold;margin-left: 5px;"><?php echo $profile_member["profile"]; ?><br><br></div>
+
+
+                
+                	<div class="desc" style="text-align:left;font-weight: bold;margin-left: 5px;font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;font-size: 15px;"><?php echo $profile_member["profile"]; ?><br><br></div>
                 </div>
             </div>
         </div>
@@ -244,13 +279,19 @@ if(!isset($error)){
 							</div>
 
 							<div>
-								<img class="img-responsive" src="picture_path/<?php echo $profile_member["picture_path"];?>" alt="mypage" style="text-align:center;height:120px;width:120px;color:#7f7f7f;border-radius:50%;object-fit: cover;>
+                <?php if(!empty($profile_member["picture_path"])){  ?>
+								<img class="img-responsive" src="picture_path/<?php echo $profile_member["picture_path"];?>" alt="mypage" style="text-align:center;height:120px;width:120px;color:#7f7f7f;border-radius:50%;object-fit: cover;">
 							</div>
-              <form method="post" action="" enctype="multipart/form-data" role="form">
+              <?php }else{ ?>
+              <img class="img" src="picture_path/person-976759_1280.jpg?>" style="height:50px;width:50px;color:#7f7f7f;border-radius:50%;object-fit: cover;margin-bottom:25px">
+              <?php } ?>
 
+
+
+              <form method="post" action="" enctype="multipart/form-data" role="form">
 							<div class="col-xs-offset-8 col-xs-4 col-md-offset-8 col-md-4 col-lg-offset-8 col-lg-4">
 <!-- 								<button  class="button" style="border-radius: 100px;box-shadow: none;cursor: pointer;font-size:14px;font-weight:400;line-height: 20px;padding: 6px,16px;position: relative;text-align:center;white-space: nowrap;color: #fff;background-color: #3B5998;font: inherit;border-color:#fff;height: 40px;width: 100px;">画像を選択</button> -->
-                <input type="file" name="picture_path" class="form-control" >
+              <input type="file" name="picture_path" class="form-control" >
 
 							</div>
               <br><br><br><br>

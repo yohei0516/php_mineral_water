@@ -94,14 +94,9 @@ if (isset($_GET['action']) && $_GET['action']  == 'rewrite'){
       }
     }
 
-
   }
 
-
   ?>
-
-
-
 
 <!DOCTYPE html>
 <html lang="ja">
@@ -152,12 +147,11 @@ if (isset($_GET['action']) && $_GET['action']  == 'rewrite'){
         <?php }elseif(isset($error["password"]) && $error["password"]=='length'){?>
         <p class="error" style="color: red;">※パスワードは４文字以上を入力してください。</p>
         <?php } ?>
-
         </div>
 
         <div class="form-item">
           <label for="password_again"></label>
-          <input type="password_again" name="password_again" required="required" placeholder="(パスワード再入力)"></input>
+          <input type="password" name="password_again" required="required" placeholder="(パスワード再入力)"></input>
         <?php if(isset($error["password_again"]) && $error["password_again"] == 'wrong'){ ?>
         <p class="error" style="color: red;">※パスワードが一致しません。</p>
         <?php } ?>
@@ -169,7 +163,7 @@ if (isset($_GET['action']) && $_GET['action']  == 'rewrite'){
         </div>
       </form>
       <div class="form-footer">
-        <p><a href="../index.html">トップへ戻る</a></p>
+        <p><a href="../index.php">トップへ戻る</a></p>
       </div>
     </div>  
 </body>

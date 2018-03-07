@@ -2,14 +2,10 @@
   session_start();
   // DBの接続
   require('dbconnect.php');
+  require('display.php');
 
-  $sql = "SELECT * FROM `kotobato_members` WHERE `id`=".$_GET["member_id"];
-
-  $stmt = $dbh->prepare($sql);
-  $stmt->execute();
-
-  $profile_member = $stmt->fetch(PDO::FETCH_ASSOC);
-
+ // var_dump($_GET);
+ //  exit;
 
   // ログインしている人のプロフィール情報をmembersテーブルから取得
   $sql = "SELECT * FROM `kotobato_members` WHERE `id`=".$_GET["member_id"];
@@ -18,6 +14,82 @@
   $profile_member = $stmt->fetch(PDO::FETCH_ASSOC);
   //   var_dump($profile_member);
   // exit;
+
+try{ 
+  $sql_all = "SELECT * FROM `kotobato_follows`";
+  $stmt_all = $dbh->prepare($sql_all);
+  $stmt_all->execute();
+
+
+  $follows = array();
+  $display = array();
+  $display_one = array();
+
+    while (1) {
+      $follow_all = $stmt_all->fetch(PDO::FETCH_ASSOC);
+
+
+      if($follow_all == false){
+        break;
+      }else{
+
+        $follows[] = $follow_all;
+      }
+    }
+  }catch(Exception $e){
+    echo 'SQL実行エラー:'.$e->getMessage();
+    exit();
+}
+
+
+try {
+  $sql_mem = "SELECT * FROM `kotobato_members`";
+  $stmt_mem = $dbh->prepare($sql_mem);
+  $stmt_mem->execute();
+
+  $member_all = array();
+
+  while(1){
+    $follow_mem = $stmt_mem->fetch(PDO::FETCH_ASSOC);
+    if($follow_mem == false){
+        break;
+      }else{
+        $member_all[] = $follow_mem;
+      }
+   }
+  
+}catch (Exception $e) {
+  exit;
+}
+
+
+
+foreach ($follows as $f){   
+      if($_GET["member_id"] == $f["follower_id"]){
+        foreach ($member_all as $men) {
+          if($men["id"] == $f["member_id"]){
+            $display[]= $men;
+          }
+        }
+      }
+}       
+
+
+  // foreach ($display as $fo) {
+  //   foreach ($member_all as $g) {
+  //     if ($fo["member_id"] == $g["id"]) {
+  //       $display_one[] = $fo;
+  //       $display_one[] = $g;
+  //     }
+  //   }
+  // }
+
+  // $display[] = array_unique($display_one["member_id"]);
+            // echo "<pre>";
+            // var_dump($display);
+            // echo "</pre>";
+            // exit;
+
 
   //一覧データを取得
   $sql = "SELECT * FROM `kotobato_members` INNER JOIN `kotobato_follows` ON `kotobato_members`.`id` = `kotobato_follows`.`member_id` WHERE `kotobato_follows`.`follower_id` = ".$_SESSION["id"]." ORDER BY `kotobato_follows`.`created` DESC";
@@ -52,7 +124,7 @@
   if (isset($_GET["follow_id"])){
     //follow情報を記録するSQL文を作成
     $sql = "INSERT INTO `kotobato_follows` (`member_id`, `follower_id`) VALUES (?, ?);";
-    $data = array($_SESSION["id"],$_GET["follow_id"]);
+    $data = array($_GET["follow_id"],$_SESSION["id"]);
     $fl_stmt = $dbh->prepare($sql);
     $fl_stmt->execute($data);
     //フォロー押す前の状態に戻す（再読込で、再度フォロー処理が動くのを防ぐ）
@@ -63,7 +135,7 @@
   if(isset($_GET["unfollow_id"])){
     // フォロー情報を削除するSQLを作成
     $sql = "DELETE FROM `kotobato_follows` WHERE `member_id`=? AND `follower_id`=?";
-    $data = array($_SESSION["id"],$_GET["unfollow_id"]);
+    $data = array($_GET["follow_id"],$_SESSION["id"]);
     $unfl_stmt = $dbh->prepare($sql);
     $unfl_stmt->execute($data);
 
@@ -111,6 +183,7 @@
 	<![endif]-->
 
 
+ <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
 <style>
 
 
@@ -121,16 +194,19 @@
 	<div class="gtco-loader"></div>
 	
 	<div id="page">
-	<nav class="gtco-nav" role="navigation">
+
+<?php include('nav.php');?>
+
+<!-- 	<nav class="gtco-nav" role="navigation">
 		<div class="container">
 			<div class="row">
 				<div class="col-xs-8 text-left">
 					<div id="gtco-logo"><a href="main.html">コトバと<span>.</span></a></div>
 				</div>
 				<div class="col-xs-10 text-right menu-1">
-					<ul>
+					<ul> -->
 						<!-- プルダウンできるコード -->
-						<!--<li class="has-dropdown">
+<!-- 						<li class="has-dropdown">
 							<a href="category.html">投稿</a>
 							<ul class="dropdown">
 								<li><a href="#">Python</a></li>
@@ -138,7 +214,7 @@
 								<li><a href="#">HTML5/CSS3</a></li>
 								<li><a href="#">Django</a></li>
 							</ul>
-						</li> -->
+						</li> 
 						<li><a href="#">投稿</a></li>
 						<li><a href="#">ジャンル</a></li>
 						<li><a href="#">検索</a></li>
@@ -149,7 +225,7 @@
 			</div>
 			
 		</div>
-	</nav>
+	</nav> -->
 	
 <div id="fh5co-blog-section">
 		<div class="container">
@@ -168,9 +244,17 @@
 
                 </div>
                <div style="background-color: #fff;border-bottom-right-radius: 10px;border-bottom-left-radius: 10px;border-bottom: solid 2px #3B5998;border-right: solid 2px #3B5998;border-left: solid 2px #3B5998;">
-                <div class="avatar" style="text-align: center;">
-                    <img alt="" src="picture_path/<?php echo $profile_member["picture_path"];?>" style="object-fit: cover;">
+
+                <?php if(!empty($profile_member["picture_path"])){  ?>
+                <div class="avatar" style="text-align: center;" style="border-top-left-radius: 10px;border-top-right-radius: 10px;">
+                    <img src="picture_path/<?php echo $profile_member["picture_path"];?>" style="object-fit: cover;">
                 </div>
+                <?php }else{ ?>
+                <div class="avatar" style="text-align: center;" style="border-top-left-radius: 10px;border-top-right-radius: 10px;">
+                    <img src="picture_path/person-976759_1280.jpg?>" style="object-fit: cover;">
+                </div>
+                <?php } ?>
+                
                 <div class="info">
                     <div class="title" style="text-align: center;">
                         <h3 target="_blank" href="#" style="color:black;font-family: arial, sans-serif;font-weight: bold;"><?php echo $profile_member["nick_name"]; ?></h>
@@ -194,14 +278,19 @@
 						        <?php } ?> -->
 
                  </div> 
-                <div class="bottom" style="text-align: center;">
-                    <a class="posts" href="profile.php?member_id=<?php echo $profile_member["id"];?>" style="color:#7f7f7f;font-weight: bold;">投稿</a>
-                    <a class="favorite" href="favorite.php?member_id=<?php echo $profile_member["id"];?>" style="color:#7f7f7f;font-weight: bold;">お気に入り</a>
 
-          <a href="follows.php?member_id=<?php echo $profile_member["id"];?>">フォロー</a>
-          <a href="following.php?member_id=<?php echo $profile_member["id"];?>">フォロワー</a>
+
+                <div class="bottom" style="text-align: center;font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;">
+                    <a class="posts" href="profile.php?member_id=<?php echo $profile_member["id"];?>" style="color:#7f7f7f;font-weight: bold;font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;font-size: 16px;">投稿</a>
+                    <a class="favorite" href="favorite.php?member_id=<?php echo $profile_member["id"];?>" style="color:#7f7f7f;font-weight: bold;font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;font-size: 16px;">お気に入り</a>
+
+                    <a href="follows.php?member_id=<?php echo $profile_member["id"];?>" style="color:#7f7f7f;font-weight: bold;font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;font-size: 16px;">フォロー</a>
+                    <a href="following.php?member_id=<?php echo $profile_member["id"];?>" style="color:#7f7f7f;font-weight: bold;font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;font-size: 16px;">フォロワー</a>
                 </div>
-                	<div class="desc" style="text-align:left;font-weight: bold;margin-left: 5px;">
+
+
+
+                	<div class="desc" style="text-align:left;font-weight: bold;margin-left: 5px;font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;font-size: 15px;">
                 		<?php echo $profile_member["profile"]; ?><br><br>
                  	</div>
                 </div>
@@ -211,18 +300,17 @@
 						<div class="col-xs-12 col-md-7 col-lg-offset-1 col-lg-7" style="margin-top:245px;">
 							<div class="mypage-inner">
 								
-								<?php foreach ($post_list as $one_post) { ?>  
+								<?php foreach ($display as $one) { ?>  
 									<div class="col-xs-4 desc col-md-6 col-lg-4" align="center" style="background-color: white;width:200px; height:240px;margin-right: 5px;margin-top: 5px;border-radius:10px;border: 2px solid #3B5998;">
-										<img class="img-responsive" src="images/image_1.jpg" alt="mypage" style="width:120px; height:120px;border-radius:50%;margin-top: 5px;">
-										<h5 style="font-weight: bold;margin-top: 25px;"><?php echo $one_post["nick_name"]; ?></h5>
-										      <?php if ($one_post["following_flag"] == 0){ ?>
-								          <a href="follows.php?follow_id=<?php echo $one_post["member_id"]; ?>">
-								        <button class="btn btn-default">フォロー</button></a>
-								        <?php }else{ ?>
-								          <a href="follows.php?unfollow_id=<?php echo $one_post["member_id"]; ?>">
-								          <button class="btn btn-default">フォロー解除</button>
-								          </a>
-								        <?php } ?>
+
+                 <?php if(!empty($one["picture_path"])){ ?>
+                 <img class="img-responsive" src="picture_path/<?php echo $one["picture_path"];?>" alt="mypage" style="width:120px; height:120px;border-radius:50%;margin-top: 5px;object-fit: cover;">
+                <?php }else{ ?>
+               <img class="img-responsive" src="picture_path/person-976759_1280.jpg?>" style="width:120px; height:120px;border-radius:50%;margin-top: 5px;object-fit: cover;">
+                <?php } ?>
+
+										<h5 style="font-weight: bold;margin-top: 25px;"><?php echo $one["nick_name"]; ?></h5>
+                     <a href="following.php?unfollow_id=<?php echo $one["follower_id"]; ?>&following.php?member_id=<?php echo $profile_member["id"]; ?>"><i class="far fa-hand-point-up" aria-hidden="true" style="color:#DC143C;font-size: 30px;"></i></a>   
 								        </div>
 								        <?php } ?>
 									</div>
