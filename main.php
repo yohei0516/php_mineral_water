@@ -102,7 +102,7 @@
 					<ul id="gtco-post-list">
 
 
-          <?php for ($i=1; $i <=12 ; $i++) { 
+          <?php for ($i=1; $i <=30 ; $i++) { 
             foreach($display_list as $post){
              if($post["row"] == $i){?>
                 <?php if ($post["size"] == "B") {?>

@@ -2,30 +2,30 @@
   require('function.php');
   require('dbconnect.php');
   login_check();
-  require('display.php');
+  // require('display.php');
+
 
   // DBの接続
   $sql = "SELECT * FROM `kotobato_members` WHERE `id`=".$_GET["member_id"];
 
   $stmt = $dbh->prepare($sql);
   $stmt->execute();
-
   $profile_member = $stmt->fetch(PDO::FETCH_ASSOC);
 
 
 // var_dump($profile_member);
 //   exit;
-  // ログインしている人のプロフィール情報をmembersテーブルから取得
-  $sql = "SELECT * FROM `kotobato_members` WHERE `id`=".$_SESSION["id"];
-  $stmt = $dbh->prepare($sql);
-  $stmt->execute();
-  $favorite_member = $stmt->fetch(PDO::FETCH_ASSOC);
+  // // ログインしている人のプロフィール情報をmembersテーブルから取得
+  // $sql = "SELECT * FROM `kotobato_members` WHERE `id`=".$_SESSION["id"];
+  // $stmt = $dbh->prepare($sql);
+  // $stmt->execute();
+  // $favorite_member = $stmt->fetch(PDO::FETCH_ASSOC);
   //   var_dump($profile_member);
-  // exit;
-            // echo "<pre>";
-            // var_dump($_GET);
-            // echo "</pre>";
-            // exit;
+  // // exit;
+  //           echo "<pre>";
+  //           var_dump($display_list);
+  //           echo "</pre>";
+  //           exit;
   //一覧データを取得
   // $sql_fv = "SELECT * FROM `kotobato_favorites`WHERE `member_id`=".$_GET["id"]." ORDER BY `kotobato_favorites`.`created` DESC";
   // $stmt_fv = $dbh->prepare($sql_fv);
@@ -35,18 +35,138 @@
   // $sql_ps = "SELECT `kotobato_posts`.*,`kotobato_favorites`.`member_id`,`kotobato_favorites`.`post_id` FROM `kotobato_posts` INNER JOIN `kotobato_favorites` ON `kotobato_posts`.`id`=`kotobato_favorites`.`post_id` WHERE `delete_flag`=0 AND `kotobato_favorites`.`member_id` =".$_GET["member_id"]." ORDER BY `kotobato_posts`.`modified` DESC ";
 
   // "ORDER BY `kotobato_posts`.`modified` DESC"
+try {
 
- $sql_ps = "SELECT `kotobato_posts`.*,`kotobato_members`.`nick_name`,`kotobato_members`.`picture_path` FROM `kotobato_posts` INNER JOIN `kotobato_members` ON `kotobato_posts`.`member_id`=`kotobato_members`.`id` WHERE `delete_flag`=0  ORDER BY `kotobato_posts`.`modified` DESC ";
+      $faborite_all = array();
+      $sql_fv = "SELECT `kotobato_posts`.*,`kotobato_members`.`nick_name`,`kotobato_members`.`picture_path` FROM `kotobato_posts` INNER JOIN `kotobato_members` ON `kotobato_posts`.`member_id`=`kotobato_members`.`id` WHERE `delete_flag`=0 ORDER BY `kotobato_posts`.`created` DESC";
+       $stmt_fv = $dbh->prepare($sql_fv);
+       $stmt_fv->execute();
+
+       while(1){
+        $faborite_one = $stmt_fv->fetch(PDO::FETCH_ASSOC);
+        if($faborite_one == false){
+          break;
+        }else{
+                            // like数を求めるSQL文
+              $like_sql = "SELECT COUNT(*)as `like_count` FROM `kotobato_likes` WHERE `post_id`=".$faborite_one["id"];
+              // SQL文実行
+              $like_stmt = $dbh->prepare($like_sql);
+              $like_stmt->execute();
+              $like_number = $like_stmt->fetch(PDO::FETCH_ASSOC);
+              //1行分のデータに新しいキーを用意して、like数を代入
+              $faborite_one["like_count"] = $like_number["like_count"];
+              // ログインしている人がLikeしているかどうかの情報を取得
+              $login_like_sql = "SELECT COUNT(*) as `like_count` FROM `kotobato_likes` WHERE `post_id`=".$faborite_one["id"]." AND `member_id` =".$_SESSION["id"];
+              // SQL文実行
+              $login_like_stmt = $dbh->prepare($login_like_sql);
+              $login_like_stmt->execute();
+
+              // フェッチして取得
+              $login_like_number = $login_like_stmt->fetch(PDO::FETCH_ASSOC);
+              $faborite_one["login_like_flag"] = $login_like_number["like_count"];
 
 
-     $stmt_ps = $dbh->prepare($sql_ps);
-     $stmt_ps->execute();
+
+              // favorite数を求めるSQL文
+              $favorite_sql = "SELECT COUNT(*)as `favorite_count` FROM `kotobato_favorites` WHERE `post_id`=".$faborite_one["id"];
+              // SQL文実行
+              $favorite_stmt = $dbh->prepare($favorite_sql);
+              $favorite_stmt->execute();
+              $favorite_number = $favorite_stmt->fetch(PDO::FETCH_ASSOC);
+              //1行分のデータに新しいキーを用意して、like数を代入
+              $faborite_one["favorite_count"] = $favorite_number["favorite_count"];
+              // ログインしている人がLikeしているかどうかの情報を取得
+              $login_favorite_sql = "SELECT COUNT(*) as `favorite_count` FROM `kotobato_favorites` WHERE `post_id`=".$faborite_one["id"]." AND `member_id` =".$_SESSION["id"];
+              // SQL文実行
+              $login_favorite_stmt = $dbh->prepare($login_favorite_sql);
+              $login_favorite_stmt->execute();
+
+              // フェッチして取得
+              $login_favorite_number = $login_favorite_stmt->fetch(PDO::FETCH_ASSOC);
+              $faborite_one["login_favorite_flag"] = $login_favorite_number["favorite_count"];
+
+              $faborite_all[] = $faborite_one;
+        }
+       }
+
+     } catch (Exception $e) {
+  
+}
+
+
+// echo "<pre>";
+// var_dump($faborite_all);
+// echo "</pre>";
+//   exit;
+
+    // $sql_post = "SELECT `kotobato_posts`.*,`kotobato_members`.`nick_name`,`kotobato_members`.`picture_path` FROM `kotobato_posts` INNER JOIN `kotobato_members` ON `kotobato_posts`.`member_id`=`kotobato_members`.`id` WHERE `delete_flag`=0 ORDER BY `kotobato_posts`.`created` DESC";
+    // $stmt_post = $dbh->prepare($sql_post);
+    // $stmt_post->execute();
+    // $post_fv = $stmt_post->fetchALL(PDO::FETCH_ASSOC);
+
+
+    $post_fv = array();
+    $list_fv = array();
+
+      $sql_fv = "SELECT `kotobato_members`.*,`kotobato_favorites`.`post_id`,`kotobato_favorites`.`member_id` FROM `kotobato_members` INNER JOIN `kotobato_favorites` ON `kotobato_members`.`id`=`kotobato_favorites`.`member_id` ORDER BY `kotobato_favorites`.`created` DESC";
+
+       $stmt_fv = $dbh->prepare($sql_fv);
+       $stmt_fv->execute();
+       $post_fv = $stmt_fv->fetchALL(PDO::FETCH_ASSOC);
+
+foreach($post_fv as $ps){
+  if($ps["member_id"] == $_GET["member_id"]){
+    foreach ($faborite_all as $fv) {
+      if($ps["post_id"] == $fv["id"]){
+        $list_fv[] = $fv;
+      }
+    }
+  }
+}
+
+
+// `kotobato_favorites`.`member_id` =".$_GET["member_id"]."
+
+// foreach ($faborite_all as $fv) {
+//   if($fv["member_id"] == $_GET["member_id"]){
+//     foreach($post_fv as $ps){
+//       if($fv["post_id"] == $ps["id"]){
+//         $fv["favorite_post"] = $ps["post_id"];
+//         $fv["favorite_member"] = $ps["member_id"];
+//         $list_fv[] = $fv;
+//       }
+//     }
+//   }
+// }
+
+
+// echo "<pre>";
+// var_dump($list_fv);
+// echo "</pre>";
+//   exit;
+
+// foreach ($display_list as $one) {
+//   if($one["post_id"] == )
+
+// }
+
+
             // echo "<pre>";
-            // var_dump($_GET);
+            // var_dump($faborite_all);
             // echo "</pre>";
             // exit;
-  // 一覧表示用の配列を用意
-  $post_list = array();
+
+ // $sql_ps = "SELECT `kotobato_posts`.*,`kotobato_members`.`nick_name`,`kotobato_members`.`picture_path` FROM `kotobato_posts` INNER JOIN `kotobato_members` ON `kotobato_posts`.`member_id`=`kotobato_members`.`id` WHERE `delete_flag`=0  ORDER BY `kotobato_posts`.`modified` DESC ";
+
+
+ //     $stmt_ps = $dbh->prepare($sql_ps);
+ //     $stmt_ps->execute();
+ //            // echo "<pre>";
+ //            // var_dump($_GET);
+ //            // echo "</pre>";
+ //            // exit;
+ //  // 一覧表示用の配列を用意
+ //  $post_list = array();
 
            // echo "<pre>";
            //  var_dump($favorite_post);
@@ -55,64 +175,64 @@
 
         // var_dump($one_post);
   //　複数行のデータを取得するためループ
-  while (1) {
-    $one_post = $stmt_ps->fetch(PDO::FETCH_ASSOC);
-        // var_dump($one_post);
-        // exit;
-    if ($one_post == false){
-      break;
-	    }else{
+  // while (1) {
+  //   $one_post = $stmt_ps->fetch(PDO::FETCH_ASSOC);
+  //       // var_dump($one_post);
+  //       // exit;
+  //   if ($one_post == false){
+  //     break;
+	 //    }else{
 
-      $like_sql = "SELECT COUNT(*)as `like_count` FROM `kotobato_likes` WHERE `post_id`=".$one_post["member_id"];
-      // SQL文実行
-      $like_stmt = $dbh->prepare($like_sql);
-      $like_stmt->execute();
-      $like_number = $like_stmt->fetch(PDO::FETCH_ASSOC);
-      //1行分のデータに新しいキーを用意して、like数を代入
-      $one_post["like_count"] = $like_number["like_count"];
-      // ログインしている人がLikeしているかどうかの情報を取得
-      $login_like_sql = "SELECT COUNT(*) as `like_count` FROM `kotobato_likes` WHERE `post_id`=".$one_post['member_id']." AND `member_id` =".$_SESSION["id"];
-      // SQL文実行
-      $login_like_stmt = $dbh->prepare($login_like_sql);
-      $login_like_stmt->execute();
+  //     $like_sql = "SELECT COUNT(*)as `like_count` FROM `kotobato_likes` WHERE `post_id`=".$one_post["member_id"];
+  //     // SQL文実行
+  //     $like_stmt = $dbh->prepare($like_sql);
+  //     $like_stmt->execute();
+  //     $like_number = $like_stmt->fetch(PDO::FETCH_ASSOC);
+  //     //1行分のデータに新しいキーを用意して、like数を代入
+  //     $one_post["like_count"] = $like_number["like_count"];
+  //     // ログインしている人がLikeしているかどうかの情報を取得
+  //     $login_like_sql = "SELECT COUNT(*) as `like_count` FROM `kotobato_likes` WHERE `post_id`=".$one_post['member_id']." AND `member_id` =".$_SESSION["id"];
+  //     // SQL文実行
+  //     $login_like_stmt = $dbh->prepare($login_like_sql);
+  //     $login_like_stmt->execute();
 
-      // フェッチして取得
-      $login_like_number = $login_like_stmt->fetch(PDO::FETCH_ASSOC);
-      $one_post["login_like_flag"] = $login_like_number["like_count"];
-
-
-
-      // like数を求めるSQL文
-      $favorite_sql = "SELECT COUNT(*)as `favorite_count` FROM `kotobato_favorites` WHERE `post_id`=".$one_post["member_id"];
-      // SQL文実行
-      $favorite_stmt = $dbh->prepare($favorite_sql);
-      $favorite_stmt->execute();
-      $favorite_number = $favorite_stmt->fetch(PDO::FETCH_ASSOC);
-      //1行分のデータに新しいキーを用意して、like数を代入
-      $favorite_post["favorite_count"] = $favorite_number["favorite_count"];
-      // ログインしている人がLikeしているかどうかの情報を取得
-      $login_favorite_sql = "SELECT COUNT(*) as `favorite_count` FROM `kotobato_favorites` WHERE `post_id`=".$one_post['member_id']." AND `member_id` =".$_SESSION["id"];
-      // SQL文実行
-      $login_favorite_stmt = $dbh->prepare($login_favorite_sql);
-      $login_favorite_stmt->execute();
-
-      // フェッチして取得
-      $login_favorite_number = $login_favorite_stmt->fetch(PDO::FETCH_ASSOC);
-      $one_post["login_favorite_flag"] = $login_favorite_number["favorite_count"];
+  //     // フェッチして取得
+  //     $login_like_number = $login_like_stmt->fetch(PDO::FETCH_ASSOC);
+  //     $one_post["login_like_flag"] = $login_like_number["like_count"];
 
 
-	    // 	$sql_fv = "SELECT * FROM `kotobato_members` WHERE `id`=".$_GET['member_id'];
-	    // 	$stmt_fv = $dbh->prepare($sql_fv);
-  			// $stmt_fv->execute();
-  			// $member = $stmt_fv->fetch(PDO::FETCH_ASSOC);
+
+  //     // like数を求めるSQL文
+  //     $favorite_sql = "SELECT COUNT(*)as `favorite_count` FROM `kotobato_favorites` WHERE `post_id`=".$one_post["member_id"];
+  //     // SQL文実行
+  //     $favorite_stmt = $dbh->prepare($favorite_sql);
+  //     $favorite_stmt->execute();
+  //     $favorite_number = $favorite_stmt->fetch(PDO::FETCH_ASSOC);
+  //     //1行分のデータに新しいキーを用意して、like数を代入
+  //     $favorite_post["favorite_count"] = $favorite_number["favorite_count"];
+  //     // ログインしている人がLikeしているかどうかの情報を取得
+  //     $login_favorite_sql = "SELECT COUNT(*) as `favorite_count` FROM `kotobato_favorites` WHERE `post_id`=".$one_post['member_id']." AND `member_id` =".$_SESSION["id"];
+  //     // SQL文実行
+  //     $login_favorite_stmt = $dbh->prepare($login_favorite_sql);
+  //     $login_favorite_stmt->execute();
+
+  //     // フェッチして取得
+  //     $login_favorite_number = $login_favorite_stmt->fetch(PDO::FETCH_ASSOC);
+  //     $one_post["login_favorite_flag"] = $login_favorite_number["favorite_count"];
 
 
-  			// $one_post["nick_name"] = $member["nick_name"];
+	 //    // 	$sql_fv = "SELECT * FROM `kotobato_members` WHERE `id`=".$_GET['member_id'];
+	 //    // 	$stmt_fv = $dbh->prepare($sql_fv);
+  // 			// $stmt_fv->execute();
+  // 			// $member = $stmt_fv->fetch(PDO::FETCH_ASSOC);
 
-	    	$post_list[] = $one_post;
 
-	    }
-		}
+  // 			// $one_post["nick_name"] = $member["nick_name"];
+
+	 //    	$post_list[] = $one_post;
+
+	 //    }
+		// }
   //     //following_flagを用意して、自分もフォローしていたら1,フォローしてなかったら0を代入する
   //     $fv_flag_sql = "SELECT COUNT(*) as `cnt` FROM `kotobato_favorites` WHERE `member_id`=".$_SESSION["id"]." AND `member_id`=".$favorite_post["member_id"];
   //     $fv_stmt = $dbh->prepare($fv_flag_sql);
@@ -222,7 +342,7 @@
 			
 		</div>
 	</nav> -->
-	
+
 <div id="fh5co-blog-section">
 		<div class="container">
 			<div class="row" >
@@ -230,16 +350,16 @@
 
 
 <!-- 					フローティングメニューが入る -->
-					<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
 <div class="container" >
 	<div class="row">
 		<div class="col-xs-offset-2 col-xs-8 col-xs-offset-2 col-md-5 col-lg-4" style="margin-left: 0;">
 
             <div class="card hovercard" style="float:none;margin-top:95px;">
-                <div class="cardheader">
+                <div class="cardheader" style="border-top-left-radius: 10px;border-top-right-radius: 10px;">
 
                 </div>
-               <div class="background" style="background-color: #fff;">
+               <div class="background" style="background-color: #fff;border-bottom-right-radius: 10px;border-bottom-left-radius: 10px;border-bottom: solid 2px #3B5998;border-right: solid 2px #3B5998;border-left: solid 2px #3B5998;">
 
                 <?php if(!empty($profile_member["picture_path"])){  ?>
                 <div class="avatar" style="text-align: center;" style="border-top-left-radius: 10px;border-top-right-radius: 10px;">
@@ -272,13 +392,13 @@
                 </div>
 
 
-                	<div class="desc" style="text-align:left;border-color:black;border:5px;border-radius: 5px;background-color: #fff;font-weight: bold;font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;font-size: 15px;"><?php echo $profile_member["profile"]; ?><br><br></div>
+                	<div class="desc" style="text-align:left;border-color:black;border:5px;border-radius: 5px;font-weight: bold;font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;font-size: 15px;"><?php echo $profile_member["profile"]; ?><br><br></div>
                 </div>
             </div>
         </div>
 
       <div class="mypage-inner col-xs-12 col-md-7 col-lg-8">
-                <?php foreach ($post_list as $post) {  ?>
+                <?php foreach ($list_fv as $post) {  ?>
 						<div style="margin-top:190px;text-align: right;">
 							<div class="mypage-inner col-md-12 col-lg-12" style="background-color: white;margin-top: 5px;">
 
@@ -291,17 +411,17 @@
 
                       <div style="float: right;">
       							<?php if ($post["login_like_flag"] == 0){?>
-      							<a href="like.php?like_post_id=<?php echo $post["id"];?>&page=<?php echo $page; ?>" class="post-meta"><i class="far fa-thumbs-up " aria-hidden="true" style="color: #7f7f7f;font-size: 25px;" ></i></a>
+      							<a href="like_fv.php?like_post_id=<?php echo $post["id"];?>&member_id=<?php echo $profile_member["id"]; ?>" class="post-meta"><i class="far fa-thumbs-up " aria-hidden="true" style="color: #7f7f7f;font-size: 25px;" ></i></a>
       							<?php }else{?>
 
-      							<a href="like.php?unlike_post_id=<?php echo $post["id"];?>&page=<?php echo $page; ?>"><i class="far fa-thumbs-up " aria-hidden="true" style="color:#DC143C;font-size: 25px;"></i></a>
+      							<a href="like_fv.php?unlike_post_id=<?php echo $post["id"];?>&member_id=<?php echo $profile_member["id"]; ?>"><i class="far fa-thumbs-up " aria-hidden="true" style="color:#DC143C;font-size: 25px;"></i></a>
                     <?php } ?>
                     <?php if($post["like_count"] > 0){echo $post["like_count"];} ?>
       							
                    <?php if($post["login_favorite_flag"] == 0){?>
-                  <a href="favorite_function.php?favorite_post_id=<?php echo $post["id"];?>&page=<?php echo $page;?>"><i class="fas fa-heart" aria-hidden="true" style="color: #7f7f7f;font-size: 25px;"></i></a>
+                  <a href="favorite_function_fv.php?favorite_post_id=<?php echo $post["id"];?>&member_id=<?php echo $profile_member["id"]; ?>"><i class="fas fa-heart" aria-hidden="true" style="color: #7f7f7f;font-size: 25px;"></i></a>
                   <?php }else{?>
-                  <a href="favorite_function.php?unfavorite_post_id=<?php echo $post["id"];?>&page=<?php echo $page; ?>"><i class="fas fa-heart" aria-hidden="true" style="color:#DC143C;font-size: 25px;"></i></a>
+                  <a href="favorite_function_fv.php?unfavorite_post_id=<?php echo $post["id"];?>&member_id=<?php echo $profile_member["id"]; ?>"><i class="fas fa-heart" aria-hidden="true" style="color:#DC143C;font-size: 25px;"></i></a>
                   <?php } ?>
 
                     <a href="profile.php?member_id=<?php echo $post["member_id"];?>" style="color: #7f7f7f;font-size: 17px;">
