@@ -12,7 +12,7 @@
      // テーブル結合
      // ORDER BY 最新順位並び替え
      // 論理削除に対応、delete_flag = 0のものだけ取得
-     $sql = "SELECT `kotobato_posts`.*,`kotobato_members`.`nick_name`,`kotobato_members`.`picture_path` FROM `kotobato_posts` INNER JOIN `kotobato_members` ON `kotobato_posts`.`member_id`=`kotobato_members`.`id` WHERE `delete_flag`=0 ORDER BY `kotobato_posts`.`modified` DESC";
+     $sql = "SELECT `kotobato_posts`.*,`kotobato_members`.`nick_name`,`kotobato_members`.`picture_path` FROM `kotobato_posts` INNER JOIN `kotobato_members` ON `kotobato_posts`.`member_id`=`kotobato_members`.`id` WHERE `delete_flag`=0 ORDER BY `kotobato_posts`.`created` DESC";
 
      $stmt = $dbh->prepare($sql);
      $stmt->execute();

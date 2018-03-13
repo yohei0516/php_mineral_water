@@ -16,93 +16,105 @@
   //一覧データを取得
 
 
-try{ 
-  $sql_all = "SELECT * FROM `kotobato_follows`";
-  $stmt_all = $dbh->prepare($sql_all);
-  $stmt_all->execute();
+// try{ 
+//   $sql_all = "SELECT * FROM `kotobato_follows`";
+//   $stmt_all = $dbh->prepare($sql_all);
+//   $stmt_all->execute();
 
 
-  $follows = array();
-  $display = array();
-  $display_one = array();
-  $my_list= array();
-  $others = array();
+//   $follows = array();
+//   $display = array();
+//   $display_one = array();
+//   $my_list= array();
+//   $others = array();
 
-    while (1) {
-      $follow_all = $stmt_all->fetch(PDO::FETCH_ASSOC);
+//     while (1) {
+//       $follow_all = $stmt_all->fetch(PDO::FETCH_ASSOC);
 
 
-      if($follow_all == false){
-        break;
-      }else{
+//       if($follow_all == false){
+//         break;
+//       }else{
 
-        $follows[] = $follow_all;
-      }
-    }
-  }catch(Exception $e){
-    echo 'SQL実行エラー:'.$e->getMessage();
-    exit();
-}
+//         $follows[] = $follow_all;
+//       }
+//     }
+//   }catch(Exception $e){
+//     echo 'SQL実行エラー:'.$e->getMessage();
+//     exit();
+// }
+
+
+// try {
+//   $sql_mem = "SELECT * FROM `kotobato_members`";
+//   $stmt_mem = $dbh->prepare($sql_mem);
+//   $stmt_mem->execute();
+
+//   $member_all = array();
+
+//   while(1){
+//     $follow_mem = $stmt_mem->fetch(PDO::FETCH_ASSOC);
+//     if($follow_mem == false){
+//         break;
+//       }else{
+//         $member_all[] = $follow_mem;
+//       }
+//    }  
+// }catch (Exception $e) {
+//   exit;
+// }
 
 
 try {
-  $sql_mem = "SELECT * FROM `kotobato_members`";
-  $stmt_mem = $dbh->prepare($sql_mem);
-  $stmt_mem->execute();
+  
+  $sql_ing = "SELECT * FROM `kotobato_members` INNER JOIN `kotobato_follows` ON `kotobato_members`.`id` = `kotobato_follows`.`follower_id` WHERE `kotobato_follows`.`member_id` = ".$_GET["member_id"]." ORDER BY `kotobato_follows`.`created` DESC";
 
-  $member_all = array();
-
-  while(1){
-    $follow_mem = $stmt_mem->fetch(PDO::FETCH_ASSOC);
-    if($follow_mem == false){
-        break;
-      }else{
-        $member_all[] = $follow_mem;
-      }
-   }  
-}catch (Exception $e) {
-  exit;
-}
-
-
-
-
-  $sql = "SELECT * FROM `kotobato_members` INNER JOIN `kotobato_follows` ON `kotobato_members`.`id` = `kotobato_follows`.`follower_id` WHERE `kotobato_follows`.`follower_id` = ".$_SESSION["id"]." ORDER BY `kotobato_follows`.`created` DESC";
-
-  $stmt = $dbh->prepare($sql);
-  $stmt->execute();
+  $stmt_ing = $dbh->prepare($sql_ing);
+  $stmt_ing->execute();
   // 一覧表示用の配列を用意
   $post_list = array();
   //　複数行のデータを取得するためループ
   while (1) {
-    $one_post = $stmt->fetch(PDO::FETCH_ASSOC);
+    $one_post = $stmt_ing->fetch(PDO::FETCH_ASSOC);
     // var_dump($one_post);
     // exit;
     if ($one_post == false){
       break;
     }else{
-      // //データが取得できている
-      // $fl_flag_sql = "SELECT COUNT(*) as `cnt` FROM `kotobato_follows` WHERE `member_id`=".$_SESSION["id"]." AND `follower_id`=".$one_post["id"];
-      // $fl_stmt = $dbh->prepare($fl_flag_sql);
-      // $fl_stmt->execute();
-      // $fl_flag = $fl_stmt->fetch(PDO::FETCH_ASSOC);
-      //一覧の時に必要
-      // $one_post["following_flag"]=$fl_flag["cnt"];
-      //データが取得できている
-      $my_list[] = $one_post;
+        //following_flagを用意して、自分もフォローしていたら1,フォローしてなかったら0を代入する
+        $fl_flag_sql = "SELECT COUNT(*) as `cnt` FROM `kotobato_follows` WHERE `follower_id`=".$_SESSION["id"]." AND `member_id`=".$one_post["follower_id"];
+        $fl_stmt = $dbh->prepare($fl_flag_sql);
+        $fl_stmt->execute();
+        $fl_flag = $fl_stmt->fetch(PDO::FETCH_ASSOC);
+        //一覧の時に必要
+        $one_post["following_flag"]=$fl_flag["cnt"];
+        //データが取得できている
+      $post_list[] = $one_post;
     }
   }
+}catch (Exception $e) {
+  echo 'SQL実行エラー:'.$e->getMessage();
+  exit();
+  
+}
 
 
-foreach ($follows as $f){   
-      if($_GET["member_id"] == $f["member_id"]){
-        foreach ($member_all as $men) {
-          if($men["id"] == $f["follower_id"]){
-            $display[]= $men;
-          }
-        }
-      }
-}       
+
+  // echo "<pre>";
+  // var_dump($post_list);
+  // // exit;
+  // echo "</pre>";
+
+
+// foreach ($follows as $f){   
+//       if($_GET["member_id"] == $f["member_id"]){
+//         foreach ($member_all as $men) {
+//           if($men["id"] == $f["follower_id"]){
+//             $display[]= $men;
+//           }
+//         }
+//       }
+// }       
 
 
 
@@ -112,14 +124,14 @@ foreach ($follows as $f){
   // echo "</pre>";
 
 
-foreach($follows as $o){
-  if($o["follower_id"] == $_SESSION["id"])
-    foreach($display as $j){
-      if($o["member_id"] == $j["id"]){
-        $others[] = $j;
-      }
-    }
-}
+// foreach($follows as $o){
+//   if($o["follower_id"] == $_SESSION["id"])
+//     foreach($display as $j){
+//       if($o["member_id"] == $j["id"]){
+//         $others[] = $j;
+//       }
+//     }
+// }
 
 
 // foreach ($my_list as $p){   
@@ -135,14 +147,14 @@ foreach($follows as $o){
 
 //フォロー処理
 // profile.php?follow_id=7 というリンクが推された＝フォローボタンが押された
-  if (isset($_GET["follow_id"])){
+  if (isset($_GET["follower_id"])){
     //follow情報を記録するSQL文を作成
     $fl_sql = "INSERT INTO `kotobato_follows` (`member_id`,`follower_id`) VALUES (?, ?);";
-    $data = array($_GET["follow_id"],$_SESSION["id"]);
+    $fl_data = array($_GET["follower_id"],$_SESSION["id"]);
     $fl_stmt = $dbh->prepare($fl_sql);
     $fl_stmt->execute($fl_data);
     //フォロー押す前の状態に戻す（再読込で、再度フォロー処理が動くのを防ぐ）
-    header("Location: follows.php");
+    header("Location: following.php?member_id=".$_GET["member_id"]);
   }
 
 //フォロー解除処理
@@ -154,8 +166,7 @@ foreach($follows as $o){
     $unfl_stmt->execute($data);
 
     //フォロー解除を押す前の状態に戻す
-    header("Location: following.php");
-
+    header("Location: following.php?member_id=".$_GET["member_id"]);
   }
   
  ?>
@@ -292,7 +303,7 @@ foreach($follows as $o){
 						<div class="col-xs-12 col-md-7 col-lg-offset-1 col-lg-7" style="margin-top:245px;">
 							<div class="mypage-inner">
 								
-                  <?php foreach($display as $one){ ?>
+                  <?php foreach($post_list as $one){ ?>
 									<div class="col-xs-4 desc col-md-6 col-lg-4" align="center" style="background-color: white;width:200px; height:240px;margin-right: 5px;margin-top: 5px;border-radius:10px;border: 2px solid #3B5998;">
 
                    <?php if(!empty($one["picture_path"])){ ?>
@@ -303,16 +314,14 @@ foreach($follows as $o){
 
 										<h5 style="font-weight: bold;margin-top: 25px;"><?php echo $one["nick_name"]; ?></h5>
 
-                     <a href="follows.php?follow_id=<?php echo $one["id"]; ?>&member_id=<?php echo $profile_member["id"];?>"><i class="far fa-hand-point-up" ria-hidden="true" style="font-size: 30px;color:#DC143C"></i></a>
+                    <?php if($_SESSION["id"] == $one["follower_id"]){ ?>
+                    <?php }elseif($one["following_flag"] == 0){ ?>
+                     <a href="following.php?member_id=<?php echo $one["member_id"];?>&follower_id=<?php echo $one["follower_id"]; ?>" ><i class="far fa-hand-point-up" ria-hidden="true" style="font-size: 30px;color:#7f7f7f"></i></a>
 
-<!--                     <?php foreach($others as $yet){ ?>
-                     <?php if($yet["id"] != $one["id"]){ ?>
-                     <a href="follows.php?follow_id=<?php echo $one["id"]; ?>&member_id=<?php echo $profile_member["id"];?>"><i class="far fa-hand-point-up" ria-hidden="true" style="font-size: 30px;color:#7f7f7f"></i></a>
-                    <?php }?>
-                    <?php if($yet["id"] = $one["id"]){ ?>
-                    <a href="follows.php?unfollow_id=<?php echo $one["id"]; ?>&member_id=<?php echo $profile_member["id"];?>"><i class="far fa-hand-point-up" aria-hidden="true" style="color:#DC143C;font-size: 30px;"></i></a>
+                    <?php }else{?>
+                    <a href="following.php?member_id=<?php echo $one["member_id"];?>&unfollow_id=<?php echo $one["follower_id"]; ?>"><i class="far fa-hand-point-up" aria-hidden="true" style="color:#DC143C;font-size: 30px;"></i></a>
                     <?php } ?>
-                   <?php } ?> -->
+
                    </div>
                   <?php } ?>
 								

@@ -11,10 +11,8 @@
 // session_idだとログインされている人のIDになってしまう
 
   $sql = "SELECT * FROM `kotobato_members` WHERE `id`=".$_GET["member_id"];
-
   $stmt = $dbh->prepare($sql);
   $stmt->execute();
-
   $profile_member = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // profile.php?member_id=<?php echo $profile_member["id"]);
@@ -24,24 +22,32 @@
   // exit;
 
   //一覧データを取得
-  $sql = "SELECT `kotobato_posts`.*,`kotobato_members`.`nick_name` FROM `kotobato_posts` INNER JOIN `kotobato_members` ON `kotobato_posts`.`member_id`=`kotobato_members`.`id` WHERE `delete_flag`=0 AND `kotobato_posts`.`member_id`=".$_GET["member_id"]." ORDER BY `kotobato_posts`.`modified` DESC ";
-  $stmt = $dbh->prepare($sql);
-  $stmt->execute();
-  // 一覧表示用の配列を用意
-  $post_list = array();
-  //　複数行のデータを取得するためループ
-  while (1) {
-    $one_post = $stmt->fetch(PDO::FETCH_ASSOC);
+  // $sql = "SELECT `kotobato_posts`.*,`kotobato_members`.`nick_name` FROM `kotobato_posts` INNER JOIN `kotobato_members` ON `kotobato_posts`.`member_id`=`kotobato_members`.`id` WHERE `delete_flag`=0 AND `kotobato_posts`.`member_id`=".$_GET["member_id"]." ORDER BY `kotobato_posts`.`modified` DESC ";
+  // $stmt = $dbh->prepare($sql);
+  // $stmt->execute();
+  // // 一覧表示用の配列を用意
+  // $post_list = array();
+  // //　複数行のデータを取得するためループ
+  // while (1) {
+  //   $one_post = $stmt->fetch(PDO::FETCH_ASSOC);
 
-  //     var_dump($one_post);
-  // exit;
-    if ($one_post == false){
-      break;
-    }else{
-      //データが取得できている
-      $post_list[] = $one_post;
-    }
+  // //     var_dump($one_post);
+  // // exit;
+  //   if ($one_post == false){
+  //     break;
+  //   }else{
+  //     //データが取得できている
+  //     $post_list[] = $one_post;
+  //   }
+  // }
+
+$pro_list = array();
+foreach($display_list as $pro){
+  if($pro["member_id"] == $_GET["member_id"]){
+    $pro_list[] = $pro;
   }
+}
+
 
       //自分もフォローしていたら１、フォローしていなかったら０を取得。
       $fl_flag_sql = "SELECT COUNT(*) as `cnt` FROM `kotobato_follows` WHERE `member_id`=".$_SESSION["id"]." AND `follower_id`=".$_GET["member_id"];
@@ -232,7 +238,7 @@
 
 
       <div class="mypage-inner col-xs-12 col-md-7 col-lg-8">
-        <?php foreach ($display_list as $post) {?>
+        <?php foreach ($pro_list as $post) {?>
        <div style="margin-top:170px;text-align: right";>
          <?php  if($post["member_id"] == $profile_member["id"]) { ?>
 							<div class="mypage-inner col-md-12  col-lg-12" style="background-color: white;margin-top: 5px;">
@@ -245,17 +251,17 @@
  
                    <div style="float: right;">
                   <?php if ($post["login_like_flag"] == 0){?>
-                  <a href="like.php?like_post_id=<?php echo $post["id"];?>&page=<?php echo $page;?>"><i class="far fa-thumbs-up " aria-hidden="true" style="color: #7f7f7f;font-size: 25px;" ></i></a>
+                  <a href="like_pro.php?like_post_id=<?php echo $post["id"];?>&member_id=<?php echo $profile_member["id"]; ?>"><i class="far fa-thumbs-up " aria-hidden="true" style="color: #7f7f7f;font-size: 25px;" ></i></a>
                   <?php }else{?>
 
-                  <a href="like.php?unlike_post_id=<?php echo $post["id"];?>&page=<?php echo $page; ?>"><i class="far fa-thumbs-up " aria-hidden="true" style="color:#DC143C;font-size: 25px;"></i></a>
+                  <a href="like_pro.php?unlike_post_id=<?php echo $post["id"];?>&member_id=<?php echo $profile_member["id"]; ?>"><i class="far fa-thumbs-up " aria-hidden="true" style="color:#DC143C;font-size: 25px;"></i></a>
                   <?php } ?>
                   <?php if($post["like_count"] > 0){echo $post["like_count"];} 
 
                     if($post["login_favorite_flag"] == 0){?>
-                  <a href="favorite_function.php?favorite_post_id=<?php echo $post["id"];?>&page=<?php echo $page;?>"><i class="fas fa-heart" aria-hidden="true" style="color: #7f7f7f;font-size: 25px;"></i></a>
+                  <a href="favorite_function_pro.php?favorite_post_id=<?php echo $post["id"];?>&member_id=<?php echo $profile_member["id"]; ?>"><i class="fas fa-heart" aria-hidden="true" style="color: #7f7f7f;font-size: 25px;"></i></a>
                   <?php }else{?>
-                  <a href="favorite_function.php?unfavorite_post_id=<?php echo $post["id"];?>&page=<?php echo $page; ?>"><i class="fas fa-heart" aria-hidden="true" style="color:#DC143C;font-size: 25px;"></i></a>
+                  <a href="favorite_function_pro.php?unfavorite_post_id=<?php echo $post["id"];?>&member_id=<?php echo $profile_member["id"]; ?>"><i class="fas fa-heart" aria-hidden="true" style="color:#DC143C;font-size: 25px;"></i></a>
                   <?php } ?>
 
 

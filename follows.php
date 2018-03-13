@@ -2,77 +2,202 @@
   session_start();
   // DBの接続
   require('dbconnect.php');
-  require('display.php');
 
- // var_dump($_GET);
- //  exit;
+    $member = $_GET["member_id"];
 
-  // ログインしている人のプロフィール情報をmembersテーブルから取得
-  $sql = "SELECT * FROM `kotobato_members` WHERE `id`=".$_GET["member_id"];
-  $stmt = $dbh->prepare($sql);
-  $stmt->execute();
-  $profile_member = $stmt->fetch(PDO::FETCH_ASSOC);
-  //   var_dump($profile_member);
-  // exit;
-
-try{ 
-  $sql_all = "SELECT * FROM `kotobato_follows`";
-  $stmt_all = $dbh->prepare($sql_all);
-  $stmt_all->execute();
+            //             echo "<pre>";
+            // var_dump($member);
+            // echo "</pre>";
 
 
-  $follows = array();
-  $display = array();
-  $display_one = array();
-
-    while (1) {
-      $follow_all = $stmt_all->fetch(PDO::FETCH_ASSOC);
+    $sql = "SELECT * FROM `kotobato_members` WHERE `id`=".$member;
 
 
-      if($follow_all == false){
-        break;
-      }else{
+    $stmt = $dbh->prepare($sql);
+    $stmt->execute();
+    $profile_member = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        $follows[] = $follow_all;
-      }
-    }
-  }catch(Exception $e){
-    echo 'SQL実行エラー:'.$e->getMessage();
-    exit();
-}
+    // member();
+      // var_dump($profile_member);
+    // exit;
+  try{ 
+    $sql_fow = "SELECT * FROM `kotobato_members` INNER JOIN `kotobato_follows` ON `kotobato_members`.`id` = `kotobato_follows`.`member_id` WHERE `kotobato_follows`.`follower_id` = ".$member." ORDER BY `kotobato_follows`.`created` DESC";
+    $stmt_fow = $dbh->prepare($sql_fow);
+    $stmt_fow->execute();
 
+    $follows = array();
 
-try {
-  $sql_mem = "SELECT * FROM `kotobato_members`";
-  $stmt_mem = $dbh->prepare($sql_mem);
-  $stmt_mem->execute();
+      while (1) {
+        $follow_fow = $stmt_fow->fetch(PDO::FETCH_ASSOC);
 
-  $member_all = array();
+        if($follow_fow == false){
+          break;
+        }else{
 
-  while(1){
-    $follow_mem = $stmt_mem->fetch(PDO::FETCH_ASSOC);
-    if($follow_mem == false){
-        break;
-      }else{
-        $member_all[] = $follow_mem;
-      }
-   }
-  
-}catch (Exception $e) {
-  exit;
-}
+        //following_flagを用意して、自分もフォローしていたら1,フォローしてなかったら0を代入する
+        $fl_flag_sql = "SELECT COUNT(*) as `cnt` FROM `kotobato_follows` WHERE `follower_id`=".$_SESSION["id"]." AND `member_id`=".$follow_fow["member_id"];
+        $fl_stmt = $dbh->prepare($fl_flag_sql);
+        $fl_stmt->execute();
+        $fl_flag = $fl_stmt->fetch(PDO::FETCH_ASSOC);
+        //一覧の時に必要
+        $follow_fow["following_flag"]=$fl_flag["cnt"];
+        //データが取得できている
 
-
-
-foreach ($follows as $f){   
-      if($_GET["member_id"] == $f["follower_id"]){
-        foreach ($member_all as $men) {
-          if($men["id"] == $f["member_id"]){
-            $display[]= $men;
-          }
+        $follows[] = $follow_fow;
         }
       }
-}       
+    }catch(Exception $e){
+      echo 'SQL実行エラー:'.$e->getMessage();
+      exit();
+  }
+
+// }
+
+
+// if(isset($_GET["follower_id"]) && !empty($_GET["follower_id"])){
+
+  if (isset($_GET["follower_id"])){
+    //follow情報を記録するSQL文を作成
+    $sql_in = "INSERT INTO `kotobato_follows` (`member_id`, `follower_id`) VALUES (?, ?);";
+    $data_in = array($_GET["follower_id"],$_SESSION["id"]);
+    $stmt_in = $dbh->prepare($sql_in);
+    $stmt_in->execute($data_in);
+    //フォロー押す前の状態に戻す（再読込で、再度フォロー処理が動くのを防ぐ）
+    header("Location: follows.php?member_id=".$_GET["member_id"]."");
+  }
+// }
+
+
+// if(isset($_GET["unfollow_id"]) && !empty($_GET["unfollow_id"])){
+
+//フォロー解除処理
+  if(isset($_GET["unfollow_id"])){
+    // フォロー情報を削除するSQLを作成
+    $sql_del = "DELETE FROM `kotobato_follows` WHERE `member_id`=? AND `follower_id`=?";
+    $data_del = array($_GET["unfollow_id"],$_SESSION["id"]);
+    $stmt_del = $dbh->prepare($sql_del);
+    $stmt_del->execute($data_del);
+
+    //フォロー解除を押す前の状態に戻す
+    header("Location: follows.php?member_id=".$_GET["member_id"]."");
+  }
+// }
+            // echo "<pre>";
+            // var_dump($follows);
+            // echo "</pre>";
+            // exit;
+
+
+?>
+<?php
+
+// メモ書き
+  // require('member_function.php');
+  
+ // var_dump($_SESSION["id"]);
+ //  exit;
+
+  // isset($_GET["member_id"]) ? htmlspecialchars($_GET["member_id"]) : null;
+  // // $GET = $_GET["member_id"];
+  
+            // echo "<pre>";
+            // var_dump($_GET);
+            // echo "</pre>";
+            // exit;
+// foreach($_GET as $w){
+
+//                 echo "<pre>";
+//             var_dump($w);
+//             echo "</pre>";
+//             exit;
+//     if(isset($w["member_id"])){
+//     $member = $w["member_id"];
+//     }
+//     if(isset($w["follower_id"])){
+//     $follower_id = $w["follower_id"];
+//     }
+//     if(isset($w["unfollow_id"])){
+//     $unfollow_id = $w["unfollow_id"];
+//     }
+// }
+            //         echo "<pre>";
+            // var_dump($w);
+            // echo "</pre>";
+            // exit;
+
+
+
+
+// if(!empty($_GET["follower_id"] || $_GET["unfollow_id"])){
+//     $f = $_GET["follower_id"];
+//     $f = $_GET["unfollow_id"];
+//     $follower_id = $f[0];
+
+// }
+
+
+            // echo "<pre>";
+            // var_dump($member["member_id"]);
+            // echo "</pre>";
+            // exit;
+
+
+            //     echo "<pre>";
+            // var_dump($_GET["member_id"]);
+            // echo "</pre>";
+            // exit;
+
+            // echo "<pre>";
+            // var_dump($member);
+            // echo "</pre>";
+// if( isset( $_GET['member_id'])) {
+//     $member = $_GET['member_id']; 
+// } 
+
+// if(isset($_GET["member_id"]) && !empty($_GET["member_id"])){
+
+// $member = (isset($_GET["member_id"]) ? $_GET["member_id"] : ''); 
+
+
+            // $member = $_GET['member_id'];
+            //         echo "<pre>";
+            // var_dump($member);
+            // echo "</pre>";
+            // exit;
+
+
+    //  $member = implode($_GET["member_id"]);
+// try {
+//   $sql_mem = "SELECT * FROM `kotobato_members`";
+//   $stmt_mem = $dbh->prepare($sql_mem);
+//   $stmt_mem->execute();
+
+//   $member_all = array();
+
+//   while(1){
+//     $follow_mem = $stmt_mem->fetch(PDO::FETCH_ASSOC);
+//     if($follow_mem == false){
+//         break;
+//       }else{
+//         $member_all[] = $follow_mem;
+//       }
+//    }
+  
+// }catch (Exception $e) {
+//   exit;
+// }
+
+
+
+// foreach ($follows as $f){   
+//       if($_GET["member_id"] == $f["follower_id"]){
+//         foreach ($member_all as $men) {
+//           if($men["id"] == $f["member_id"]){
+//             $display[]= $men;
+//           }
+//         }
+//       }
+// }       
 
 
   // foreach ($display as $fo) {
@@ -92,56 +217,38 @@ foreach ($follows as $f){
 
 
   //一覧データを取得
-  $sql = "SELECT * FROM `kotobato_members` INNER JOIN `kotobato_follows` ON `kotobato_members`.`id` = `kotobato_follows`.`member_id` WHERE `kotobato_follows`.`follower_id` = ".$_SESSION["id"]." ORDER BY `kotobato_follows`.`created` DESC";
-  $stmt = $dbh->prepare($sql);
-  $stmt->execute();
+  // $sql = "SELECT * FROM `kotobato_members` INNER JOIN `kotobato_follows` ON `kotobato_members`.`id` = `kotobato_follows`.`member_id` WHERE `kotobato_follows`.`follower_id` = ".$_SESSION["id"]." ORDER BY `kotobato_follows`.`created` DESC";
+  // $stmt = $dbh->prepare($sql);
+  // $stmt->execute();
 
   // 一覧表示用の配列を用意
-  $post_list = array();
+  // $post_list = array();
 
-  //　複数行のデータを取得するためループ
-  while (1) {
-    $one_post = $stmt->fetch(PDO::FETCH_ASSOC);
+  // //　複数行のデータを取得するためループ
+  // while (1) {
+  //   $one_post = $stmt->fetch(PDO::FETCH_ASSOC);
         // var_dump($one_post);
         // exit;
-    if ($one_post == false){
-      break;
-    }else{
+    // if ($one_post == false){
+    //   break;
+    // }else{
       //following_flagを用意して、自分もフォローしていたら1,フォローしてなかったら0を代入する
-      $fl_flag_sql = "SELECT COUNT(*) as `cnt` FROM `kotobato_follows` WHERE `member_id`=".$_SESSION["id"]." AND `follower_id`=".$one_post["member_id"];
-      $fl_stmt = $dbh->prepare($fl_flag_sql);
-      $fl_stmt->execute();
-      $fl_flag = $fl_stmt->fetch(PDO::FETCH_ASSOC);
-      //一覧の時に必要
-      $one_post["following_flag"]=$fl_flag["cnt"];
-      //データが取得できている
+  //     $fl_flag_sql = "SELECT COUNT(*) as `cnt` FROM `kotobato_follows` WHERE `member_id`=".$_SESSION["id"]." AND `follower_id`=".$one_post["member_id"];
+  //     $fl_stmt = $dbh->prepare($fl_flag_sql);
+  //     $fl_stmt->execute();
+  //     $fl_flag = $fl_stmt->fetch(PDO::FETCH_ASSOC);
+  //     //一覧の時に必要
+  //     $one_post["following_flag"]=$fl_flag["cnt"];
+  //     //データが取得できている
 
-      $post_list[] = $one_post;
-    }
-  }
+  //     $post_list[] = $one_post;
+  //   }
+  // }
 //フォロー処理
 // profile.php?follow_id=7 というリンクが推された＝フォローボタンが押された
-  if (isset($_GET["follow_id"])){
-    //follow情報を記録するSQL文を作成
-    $sql = "INSERT INTO `kotobato_follows` (`member_id`, `follower_id`) VALUES (?, ?);";
-    $data = array($_GET["follow_id"],$_SESSION["id"]);
-    $fl_stmt = $dbh->prepare($sql);
-    $fl_stmt->execute($data);
-    //フォロー押す前の状態に戻す（再読込で、再度フォロー処理が動くのを防ぐ）
-    header("Location: follows.php");
-  }
 
-//フォロー解除処理
-  if(isset($_GET["unfollow_id"])){
-    // フォロー情報を削除するSQLを作成
-    $sql = "DELETE FROM `kotobato_follows` WHERE `member_id`=? AND `follower_id`=?";
-    $data = array($_GET["follow_id"],$_SESSION["id"]);
-    $unfl_stmt = $dbh->prepare($sql);
-    $unfl_stmt->execute($data);
 
-    //フォロー解除を押す前の状態に戻す
-    header("Location: follows.php");
-  }
+
 
 ?>
 
@@ -300,7 +407,9 @@ foreach ($follows as $f){
 						<div class="col-xs-12 col-md-7 col-lg-offset-1 col-lg-7" style="margin-top:245px;">
 							<div class="mypage-inner">
 								
-								<?php foreach ($display as $one) { ?>  
+								<?php foreach ($follows as $one) { ?> 
+
+                        <!--  <?php var_dump($one["follower_id"]); ?>  -->
 									<div class="col-xs-4 desc col-md-6 col-lg-4" align="center" style="background-color: white;width:200px; height:240px;margin-right: 5px;margin-top: 5px;border-radius:10px;border: 2px solid #3B5998;">
 
                  <?php if(!empty($one["picture_path"])){ ?>
@@ -310,7 +419,14 @@ foreach ($follows as $f){
                 <?php } ?>
 
 										<h5 style="font-weight: bold;margin-top: 25px;"><?php echo $one["nick_name"]; ?></h5>
-                     <a href="following.php?unfollow_id=<?php echo $one["follower_id"]; ?>&following.php?member_id=<?php echo $profile_member["id"]; ?>"><i class="far fa-hand-point-up" aria-hidden="true" style="color:#DC143C;font-size: 30px;"></i></a>   
+
+                    <?php if($_SESSION["id"] == $one["member_id"]){ ?>
+                    <?php }elseif($one["following_flag"] == 0){ ?>
+                     <a href="follows.php?member_id=<?php echo $one["follower_id"];?>&follower_id=<?php echo $one["member_id"]; ?>" ><i class="far fa-hand-point-up" ria-hidden="true" style="font-size: 30px;color:#7f7f7f"></i></a>
+
+                    <?php }else{?>
+                    <a href="follows.php?member_id=<?php echo $one["follower_id"];?>&unfollow_id=<?php echo $one["member_id"]; ?>"><i class="far fa-hand-point-up" aria-hidden="true" style="color:#DC143C;font-size: 30px;"></i></a>
+                    <?php } ?>
 								        </div>
 								        <?php } ?>
 									</div>
