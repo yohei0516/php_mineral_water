@@ -205,7 +205,6 @@ foreach($display_list as $pro){
                   </div>
                 </div>
 					        <?php if($_SESSION["id"] != $profile_member["id"]){ ?>
-
                  <div class="tit" style="text-align: center;font-size: 30px;margin-top: -35px;">
 					        <?php if($fl_flag["cnt"] == 0){ ?>
 					        <a href="profile.php?member_id=<?php echo $profile_member["id"]; ?>&follow_id=<?php echo $profile_member["id"];?>">
@@ -214,10 +213,9 @@ foreach($display_list as $pro){
 					        <?php }else{ ?>
 					        <a href="profile.php?member_id=<?php echo $profile_member["id"]; ?>&unfollow_id=<?php echo $profile_member["id"];?>">
 					       <i class="far fa-hand-point-up" style="color:#7f7f7f;"></i></a>
-
+                  <?php } ?>
                   </div>
-
-					        <?php } ?>
+					       
 					        <?php } ?>
                 
                 <div class="bottom" style="text-align: center;font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;">
