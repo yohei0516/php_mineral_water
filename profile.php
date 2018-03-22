@@ -50,7 +50,7 @@ foreach($display_list as $pro){
 
 
       //自分もフォローしていたら１、フォローしていなかったら０を取得。
-      $fl_flag_sql = "SELECT COUNT(*) as `cnt` FROM `kotobato_follows` WHERE `member_id`=".$_SESSION["id"]." AND `follower_id`=".$_GET["member_id"];
+      $fl_flag_sql = "SELECT COUNT(*) as `cnt` FROM `kotobato_follows` WHERE `member_id`=".$_GET["member_id"]." AND `follower_id`=".$_SESSION["id"];
       $fl_stmt = $dbh->prepare($fl_flag_sql);
       $fl_stmt->execute();
       $fl_flag = $fl_stmt->fetch(PDO::FETCH_ASSOC);
@@ -63,7 +63,7 @@ foreach($display_list as $pro){
   if (isset($_GET["follow_id"])){
     //follow情報を記録するSQL文を作成
     $sql = "INSERT INTO `kotobato_follows` (`member_id`, `follower_id`) VALUES (?, ?);";
-    $data = array($_SESSION["id"],$_GET["follow_id"]);
+    $data = array($_GET["follow_id"],$_SESSION["id"]);
     $fl_stmt = $dbh->prepare($sql);
     $fl_stmt->execute($data);
        //フォロー解除を押す前の状態に戻す
@@ -74,7 +74,7 @@ foreach($display_list as $pro){
   if(isset($_GET["unfollow_id"])){
     // フォロー情報を削除するSQLを作成
     $sql = "DELETE FROM `kotobato_follows` WHERE `member_id`=? AND `follower_id`=?";
-    $data = array($_SESSION["id"],$_GET["unfollow_id"]);
+    $data = array($_GET["unfollow_id"],$_SESSION["id"]);
     $unfl_stmt = $dbh->prepare($sql);
     $unfl_stmt->execute($data);
 
@@ -204,18 +204,18 @@ foreach($display_list as $pro){
                          <?php }?> 
                   </div>
                 </div>
+
 					        <?php if($_SESSION["id"] != $profile_member["id"]){ ?>
                  <div class="tit" style="text-align: center;font-size: 30px;margin-top: -35px;">
 					        <?php if($fl_flag["cnt"] == 0){ ?>
 					        <a href="profile.php?member_id=<?php echo $profile_member["id"]; ?>&follow_id=<?php echo $profile_member["id"];?>">
-					        <i class="far fa-hand-point-up"></i></a>
+					        <i class="far fa-hand-point-up" style="color:#7f7f7f;"></i></a>
 
 					        <?php }else{ ?>
 					        <a href="profile.php?member_id=<?php echo $profile_member["id"]; ?>&unfollow_id=<?php echo $profile_member["id"];?>">
-					       <i class="far fa-hand-point-up" style="color:#7f7f7f;"></i></a>
+					       <i class="far fa-hand-point-up" style="color:#DC143C;"></i></a>
                   <?php } ?>
                   </div>
-					       
 					        <?php } ?>
                 
                 <div class="bottom" style="text-align: center;font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', Meiryo, メイリオ, Osaka, 'MS PGothic', arial, helvetica, sans-serif;">
